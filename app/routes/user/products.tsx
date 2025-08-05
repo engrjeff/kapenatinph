@@ -3,6 +3,7 @@ import { Link, redirect, useFetcher } from 'react-router';
 import z from 'zod';
 import { PageTitle } from '~/components/page-title';
 import { Button } from '~/components/ui/button';
+import { ProductTable } from '~/features/product/product-table';
 import {
   createProductSchema,
   deleteProductSchema,
@@ -111,20 +112,6 @@ export async function action(args: Route.ActionArgs) {
 
 export default function ProductsPage({ loaderData }: Route.ComponentProps) {
   const { products } = loaderData;
-  const deleteFetcher = useFetcher();
-
-  const handleDelete = (productId: string) => {
-    if (
-      confirm(
-        'Are you sure you want to delete this product? This action cannot be undone.'
-      )
-    ) {
-      deleteFetcher.submit(
-        { intent: 'delete', id: productId },
-        { method: 'POST' }
-      );
-    }
-  };
 
   if (products.length === 0) {
     return (
@@ -179,37 +166,7 @@ export default function ProductsPage({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      <div className="space-y-4">
-        {products.map((product) => (
-          <div key={product.id} className="p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {product.category.name}
-                </p>
-                <p className="text-sm font-medium">₱{product.basePrice}</p>
-                {product.hasVariants && (
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p>{product.variants.length} variant(s)</p>
-                    {product.variantOptions.map((option) => (
-                      <p key={option.id}>
-                        <span className="font-medium">{option.name}:</span>{' '}
-                        {option.values.map((v) => v.value).join(', ')}
-                      </p>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" asChild>
-                  <Link to={`/products/${product.id}/edit`}>Edit</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <ProductTable products={products} />
     </>
   );
 }
