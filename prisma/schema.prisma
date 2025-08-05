@@ -56,6 +56,119 @@ enum InventoryStatus {
   OUT_OF_STOCK
 }
 
+model ProductCategory {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  userId String // clerk user id
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Product {
+  id     String @id @default(cuid())
+  userId String // clerk user id
+
+  categoryId String
+  category   ProductCategory @relation(references: [id], fields: [categoryId])
+
+  name           String
+  description    String?
+  sku            String? // SKU for products without variants
+  basePrice      Float
+  isActive       Boolean @default(true)
+  hasVariants    Boolean @default(false)
+
+  // New variant system
+  variantOptions ProductVariantOption[]
+  variants       ProductVariant[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@unique([userId, sku])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+model ProductVariantOption {
+  id        String @id @default(cuid())
+  productId String
+  product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
+
+  name     String // e.g., "Size", "Temperature"
+  position Int    @default(0)
+
+  values ProductVariantOptionValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, name])
+  @@index([productId])
+}
+
+model ProductVariantOptionValue {
+  id       String @id @default(cuid())
+  optionId String
+  option   ProductVariantOption @relation(references: [id], fields: [optionId], onDelete: Cascade)
+
+  value    String // e.g., "8oz", "12oz", "Hot", "Cold"
+  position Int    @default(0)
+
+  variantValues ProductVariantValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([optionId, value])
+  @@index([optionId])
+}
+
+model ProductVariant {
+  id        String @id @default(cuid())
+  productId String
+  product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
+
+  title       String  // e.g., "8oz / Hot", "12oz / Cold"
+  sku         String
+  price       Float?
+  isDefault   Boolean @default(false)
+  isAvailable Boolean @default(true)
+
+  // Combination of option values
+  optionValues ProductVariantValue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, title])
+  @@unique([sku])
+  @@index([productId])
+  @@index([sku])
+}
+
+model ProductVariantValue {
+  id               String @id @default(cuid())
+  variantId        String
+  variant          ProductVariant @relation(references: [id], fields: [variantId], onDelete: Cascade)
+  optionValueId    String
+  optionValue      ProductVariantOptionValue @relation(references: [id], fields: [optionValueId], onDelete: Cascade)
+
+  @@unique([variantId, optionValueId])
+  @@index([variantId])
+  @@index([optionValueId])
+}
+
 model Inventory {
   id     String @id @default(cuid())
   userId String // clerk user id

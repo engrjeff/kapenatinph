@@ -21,6 +21,10 @@ export default [
     route('inventory/:id', 'routes/user/inventory-details.tsx'),
 
     route('products', 'routes/user/products.tsx'),
+    route('products/new', 'routes/user/products.new.tsx'),
+    route('products/:id/edit', 'routes/user/products.$id.edit.tsx'),
+
+    route('product-categories', 'routes/user/product-categories.tsx'),
 
     route('sales', 'routes/user/sales.tsx'),
   ]),
