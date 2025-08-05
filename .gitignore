@@ -11,4 +11,4 @@
 .env.local
 .env
 
-/generated/prisma
+app/generated/prisma
