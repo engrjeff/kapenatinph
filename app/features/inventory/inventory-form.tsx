@@ -61,22 +61,18 @@ export function InventoryForm({
   };
 
   const onSubmit: SubmitHandler<InventoryInputs> = async (data) => {
-    const formData = new FormData();
+    const submitData = {
+      ...data,
+      intent: isEditing ? 'update' : 'create',
+      ...(isEditing && initialValue?.id && { id: initialValue.id }),
+    };
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined) {
-        formData.append(key, String(value));
-      }
+    // Submit JSON data instead of FormData to preserve types
+    fetcher.submit(submitData, {
+      method: 'POST',
+      action: '/inventory',
+      encType: 'application/json',
     });
-
-    if (isEditing && initialValue?.id) {
-      formData.append('intent', 'update');
-      formData.append('id', initialValue.id);
-      fetcher.submit(formData, { method: 'POST', action: '/inventory' });
-    } else {
-      formData.append('intent', 'create');
-      fetcher.submit(formData, { method: 'POST', action: '/inventory' });
-    }
   };
 
   return (

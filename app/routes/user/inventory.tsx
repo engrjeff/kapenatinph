@@ -65,9 +65,7 @@ export async function loader(args: Route.LoaderArgs) {
 export async function action(args: Route.ActionArgs) {
   const userId = await requireAuth(args);
 
-  const formData = await args.request.formData();
-
-  const formEntries = Object.fromEntries(formData.entries());
+  const requestData = await args.request.json();
 
   const validationResult = z
     .discriminatedUnion('intent', [
@@ -75,7 +73,7 @@ export async function action(args: Route.ActionArgs) {
       updateInventorySchema,
       deleteInventorySchema,
     ])
-    .safeParse(formEntries);
+    .safeParse(requestData);
 
   if (!validationResult.success) {
     return z.treeifyError(validationResult.error).properties;
