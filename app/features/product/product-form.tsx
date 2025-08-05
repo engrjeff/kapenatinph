@@ -1,6 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PlusIcon, RotateCwIcon, TrashIcon, GripVerticalIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import {
+  GripVerticalIcon,
+  PlusIcon,
+  RotateCwIcon,
+  TrashIcon,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import {
   useFieldArray,
   useForm,
@@ -26,7 +31,11 @@ import { Switch } from '~/components/ui/switch';
 import { Textarea } from '~/components/ui/textarea';
 import type { ProductCategory } from '~/generated/prisma/client';
 import { generateSku } from '~/lib/utils';
-import { productSchema, type ProductInputs, type VariantOptionInputs } from './schema';
+import {
+  productSchema,
+  type ProductInputs,
+  type VariantOptionInputs,
+} from './schema';
 
 export interface ProductFormProps {
   initialValue?: any;
@@ -39,7 +48,9 @@ export function ProductForm({
   categories,
   isEditing = false,
 }: ProductFormProps) {
-  const [hasVariants, setHasVariants] = useState(initialValue?.hasVariants ?? false);
+  const [hasVariants, setHasVariants] = useState(
+    initialValue?.hasVariants ?? false
+  );
 
   const form = useForm<ProductInputs>({
     resolver: zodResolver(productSchema),
@@ -56,7 +67,11 @@ export function ProductForm({
     },
   });
 
-  const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
+  const {
+    fields: optionFields,
+    append: appendOption,
+    remove: removeOption,
+  } = useFieldArray({
     control: form.control,
     name: 'variantOptions',
   });
@@ -83,8 +98,11 @@ export function ProductForm({
         }
 
         // Check if all options have valid values
-        const validOptions = options.filter(option => 
-          option?.name && option?.values && option.values.some(v => v?.value)
+        const validOptions = options.filter(
+          (option) =>
+            option?.name &&
+            option?.values &&
+            option.values.some((v) => v?.value)
         );
 
         if (validOptions.length === 0) {
@@ -93,7 +111,9 @@ export function ProductForm({
         }
 
         // Generate all combinations
-        const combinations = generateCombinations(validOptions as VariantOptionInputs[]);
+        const combinations = generateCombinations(
+          validOptions as VariantOptionInputs[]
+        );
         const productName = values.name || '';
         const basePrice = values.basePrice;
         const newVariants = combinations.map((combo, index) => ({
@@ -115,9 +135,15 @@ export function ProductForm({
   const generateCombinations = (options: VariantOptionInputs[]) => {
     if (options.length === 0) return [];
 
-    const combinations: Array<{ title: string; options: Record<string, string> }> = [];
+    const combinations: Array<{
+      title: string;
+      options: Record<string, string>;
+    }> = [];
 
-    function generateCombos(index: number, currentCombo: Record<string, string>) {
+    function generateCombos(
+      index: number,
+      currentCombo: Record<string, string>
+    ) {
       if (index === options.length) {
         const title = Object.values(currentCombo).join(' / ');
         combinations.push({ title, options: { ...currentCombo } });
@@ -127,7 +153,10 @@ export function ProductForm({
       const option = options[index];
       if (option.values) {
         for (const value of option.values) {
-          generateCombos(index + 1, { ...currentCombo, [option.name]: value.value });
+          generateCombos(index + 1, {
+            ...currentCombo,
+            [option.name]: value.value,
+          });
         }
       }
     }
@@ -168,13 +197,17 @@ export function ProductForm({
 
   const addValueToOption = (optionIndex: number) => {
     const currentOption = form.watch(`variantOptions.${optionIndex}`);
-    const newValues = [...(currentOption.values || []), { value: '', position: currentOption.values?.length || 0 }];
+    const newValues = [
+      ...(currentOption.values || []),
+      { value: '', position: currentOption.values?.length || 0 },
+    ];
     form.setValue(`variantOptions.${optionIndex}.values`, newValues);
   };
 
   const removeValueFromOption = (optionIndex: number, valueIndex: number) => {
     const currentOption = form.watch(`variantOptions.${optionIndex}`);
-    const newValues = currentOption.values?.filter((_, index) => index !== valueIndex) || [];
+    const newValues =
+      currentOption.values?.filter((_, index) => index !== valueIndex) || [];
     form.setValue(`variantOptions.${optionIndex}.values`, newValues);
   };
 
@@ -192,7 +225,7 @@ export function ProductForm({
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="font-semibold text-sm">Basic Information</h3>
-            
+
             <FormField
               control={form.control}
               name="name"
@@ -250,7 +283,12 @@ export function ProductForm({
                   <FormItem>
                     <FormLabel>Base Price</FormLabel>
                     <FormControl>
-                      <NumberInput step={0.01} min={0} placeholder="0.00" {...field} />
+                      <NumberInput
+                        step={0.01}
+                        min={0}
+                        placeholder="0.00"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -344,9 +382,11 @@ export function ProductForm({
                       ],
                     };
                     form.setValue('variantOptions', [defaultSizeOption]);
-                    
+
                     // Generate combinations immediately
-                    const combinations = generateCombinations([defaultSizeOption]);
+                    const combinations = generateCombinations([
+                      defaultSizeOption,
+                    ]);
                     const productName = form.watch('name') || '';
                     const basePrice = form.watch('basePrice');
                     const newVariants = combinations.map((combo, index) => ({
@@ -381,7 +421,10 @@ export function ProductForm({
                   </div>
 
                   {optionFields.map((field, optionIndex) => (
-                    <div key={field.id} className="border rounded-lg p-4 space-y-4">
+                    <div
+                      key={field.id}
+                      className="border rounded-lg p-4 space-y-4"
+                    >
                       <div className="flex items-center gap-3">
                         <GripVerticalIcon className="size-4 text-muted-foreground" />
                         <FormField
@@ -389,9 +432,14 @@ export function ProductForm({
                           name={`variantOptions.${optionIndex}.name`}
                           render={({ field }) => (
                             <FormItem className="flex-1">
-                              <FormLabel className="sr-only">Option Name</FormLabel>
+                              <FormLabel className="sr-only">
+                                Option Name
+                              </FormLabel>
                               <FormControl>
-                                <Input placeholder="Option name (e.g., Size, Temperature)" {...field} />
+                                <Input
+                                  placeholder="Option name (e.g., Size, Temperature)"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -401,6 +449,8 @@ export function ProductForm({
                           type="button"
                           variant="ghost"
                           size="sm"
+                          className="shrink-0"
+                          aria-label="Delete option"
                           onClick={() => removeOption(optionIndex)}
                         >
                           <TrashIcon className="size-4" />
@@ -409,30 +459,44 @@ export function ProductForm({
 
                       {/* Option Values */}
                       <div className="ml-7 space-y-2">
-                        <FormLabel className="text-xs text-muted-foreground">Option Values</FormLabel>
-                        {form.watch(`variantOptions.${optionIndex}.values`)?.map((_, valueIndex) => (
-                          <div key={valueIndex} className="flex items-center gap-2">
-                            <FormField
-                              control={form.control}
-                              name={`variantOptions.${optionIndex}.values.${valueIndex}.value`}
-                              render={({ field }) => (
-                                <FormItem className="flex-1">
-                                  <FormControl>
-                                    <Input placeholder="Value (e.g., 8oz, Hot)" {...field} />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeValueFromOption(optionIndex, valueIndex)}
+                        <FormLabel className="text-xs text-muted-foreground">
+                          Option Values
+                        </FormLabel>
+                        {form
+                          .watch(`variantOptions.${optionIndex}.values`)
+                          ?.map((_, valueIndex) => (
+                            <div
+                              key={valueIndex}
+                              className="flex items-center gap-2"
                             >
-                              <TrashIcon className="size-4" />
-                            </Button>
-                          </div>
-                        ))}
+                              <FormField
+                                control={form.control}
+                                name={`variantOptions.${optionIndex}.values.${valueIndex}.value`}
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Value (e.g., 8oz, Hot)"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="shrink-0"
+                                aria-label="Delete option value"
+                                onClick={() =>
+                                  removeValueFromOption(optionIndex, valueIndex)
+                                }
+                              >
+                                <TrashIcon className="size-4" />
+                              </Button>
+                            </div>
+                          ))}
                         <Button
                           type="button"
                           variant="ghost"
@@ -457,15 +521,21 @@ export function ProductForm({
                     <div className="space-y-3">
                       {variantFields.map((field, index) => (
                         <div key={field.id} className="border rounded-lg p-3">
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-3 items-start">
                             <FormField
                               control={form.control}
                               name={`variants.${index}.title`}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-xs">Variant</FormLabel>
+                                  <FormLabel className="text-xs">
+                                    Variant
+                                  </FormLabel>
                                   <FormControl>
-                                    <Input {...field} readOnly className="bg-muted" />
+                                    <Input
+                                      {...field}
+                                      readOnly
+                                      className="bg-muted"
+                                    />
                                   </FormControl>
                                 </FormItem>
                               )}
@@ -486,10 +556,17 @@ export function ProductForm({
                                       variant="secondary"
                                       className="absolute inset-y-1 end-1 size-6"
                                       onClick={() => {
-                                        const variantTitle = form.watch(`variants.${index}.title`);
+                                        const variantTitle = form.watch(
+                                          `variants.${index}.title`
+                                        );
                                         const productName = form.watch('name');
-                                        const newSku = generateSku(`${productName}-${variantTitle}`);
-                                        form.setValue(`variants.${index}.sku`, newSku);
+                                        const newSku = generateSku(
+                                          `${productName}-${variantTitle}`
+                                        );
+                                        form.setValue(
+                                          `variants.${index}.sku`,
+                                          newSku
+                                        );
                                       }}
                                     >
                                       <RotateCwIcon className="size-3" />
@@ -503,35 +580,59 @@ export function ProductForm({
                               name={`variants.${index}.price`}
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel className="text-xs">Price (Optional)</FormLabel>
+                                  <FormLabel className="text-xs">
+                                    Price (Optional)
+                                  </FormLabel>
                                   <FormControl>
-                                    <NumberInput step={0.01} min={0} placeholder="Uses base price" {...field} />
+                                    <NumberInput
+                                      step={0.01}
+                                      min={0}
+                                      placeholder="Uses base price"
+                                      {...field}
+                                    />
                                   </FormControl>
                                 </FormItem>
                               )}
                             />
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full">
                               <FormField
                                 control={form.control}
                                 name={`variants.${index}.isDefault`}
                                 render={({ field }) => (
-                                  <FormItem className="flex items-center space-x-2 space-y-0">
+                                  <FormItem className="space-y-2">
+                                    <FormLabel className="text-xs">
+                                      Default
+                                    </FormLabel>
                                     <FormControl>
                                       <Switch
                                         checked={field.value}
                                         onCheckedChange={(checked) => {
                                           field.onChange(checked);
                                           if (checked) {
-                                            const basePrice = form.watch('basePrice');
+                                            const basePrice =
+                                              form.watch('basePrice');
                                             // Set basePrice for the new default variant
-                                            form.setValue(`variants.${index}.price`, basePrice);
+                                            form.setValue(
+                                              `variants.${index}.price`,
+                                              basePrice
+                                            );
                                             // Uncheck other defaults and clear their prices if they match basePrice
                                             variantFields.forEach((_, i) => {
                                               if (i !== index) {
-                                                form.setValue(`variants.${i}.isDefault`, false);
-                                                const currentPrice = form.watch(`variants.${i}.price`);
-                                                if (currentPrice === basePrice) {
-                                                  form.setValue(`variants.${i}.price`, undefined);
+                                                form.setValue(
+                                                  `variants.${i}.isDefault`,
+                                                  false
+                                                );
+                                                const currentPrice = form.watch(
+                                                  `variants.${i}.price`
+                                                );
+                                                if (
+                                                  currentPrice === basePrice
+                                                ) {
+                                                  form.setValue(
+                                                    `variants.${i}.price`,
+                                                    undefined
+                                                  );
                                                 }
                                               }
                                             });
@@ -539,7 +640,6 @@ export function ProductForm({
                                         }}
                                       />
                                     </FormControl>
-                                    <FormLabel className="text-xs">Default</FormLabel>
                                   </FormItem>
                                 )}
                               />
