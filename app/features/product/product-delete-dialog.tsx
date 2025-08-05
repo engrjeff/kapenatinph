@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useFetcher } from 'react-router';
 import {
   AlertDialog,
@@ -11,40 +12,38 @@ import {
   AlertDialogTrigger,
 } from '~/components/ui/alert-dialog';
 import type { Product } from '~/generated/prisma/client';
-import { useState } from 'react';
 
 interface ProductDeleteDialogProps {
   trigger: React.ReactNode;
   product: Product;
 }
 
-export function ProductDeleteDialog({ 
-  trigger, 
-  product 
+export function ProductDeleteDialog({
+  trigger,
+  product,
 }: ProductDeleteDialogProps) {
   const [open, setOpen] = useState(false);
   const fetcher = useFetcher();
   const isLoading = fetcher.state !== 'idle';
 
   const handleDelete = () => {
-    const formData = new FormData();
-    formData.append('intent', 'delete');
-    formData.append('id', product.id);
-    
-    fetcher.submit(formData, { method: 'POST', action: '/products' });
+    fetcher.submit(
+      { id: product.id, intent: 'delete' },
+      { method: 'POST', action: '/products', encType: 'application/json' }
+    );
     setOpen(false);
   };
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Product</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{product.name}"? This action cannot be undone and will remove all associated variants and inventory records.
+            Are you sure you want to delete "{product.name}"? This action cannot
+            be undone and will remove all associated variants and inventory
+            records.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

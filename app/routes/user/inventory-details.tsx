@@ -31,7 +31,6 @@ export async function loader(args: Route.LoaderArgs) {
   return { inventoryItem, categories };
 }
 
-
 export function ErrorBoundary() {
   return (
     <div className="space-y-4 container mx-auto max-w-lg">
@@ -53,7 +52,8 @@ export function ErrorBoundary() {
           Inventory item not found
         </h3>
         <p className="text-sm text-muted-foreground mb-6 max-w-md leading-relaxed">
-          The inventory item you're looking for doesn't exist or has been removed.
+          The inventory item you&apos;re looking for doesn&apos;t exist or has
+          been removed.
         </p>
         <Button size="sm" asChild>
           <Link to="/inventory">

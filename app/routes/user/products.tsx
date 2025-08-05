@@ -1,5 +1,5 @@
 import { PackageIcon, PlusIcon, SettingsIcon } from 'lucide-react';
-import { Link, redirect, useFetcher } from 'react-router';
+import { Link, redirect } from 'react-router';
 import z from 'zod';
 import { PageTitle } from '~/components/page-title';
 import { Button } from '~/components/ui/button';
@@ -106,7 +106,7 @@ export async function action(args: Route.ActionArgs) {
 
   if (intent === 'delete') {
     await productService.deleteProduct(validationResult.data.id, userId);
-    return validationResult.data.id;
+    return redirect('/products');
   }
 }
 

@@ -79,12 +79,12 @@ model Product {
   categoryId String
   category   ProductCategory @relation(references: [id], fields: [categoryId])
 
-  name           String
-  description    String?
-  sku            String? // SKU for products without variants
-  basePrice      Float
-  isActive       Boolean @default(true)
-  hasVariants    Boolean @default(false)
+  name        String
+  description String?
+  sku         String? // SKU for products without variants
+  basePrice   Float
+  isActive    Boolean @default(true)
+  hasVariants Boolean @default(false)
 
   // New variant system
   variantOptions ProductVariantOption[]
@@ -94,14 +94,14 @@ model Product {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, name])
-  @@unique([userId, sku])
+  @@unique([userId, name, sku])
   @@index([userId])
   @@index([categoryId])
   @@index([isActive])
 }
 
 model ProductVariantOption {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
   product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
 
@@ -118,7 +118,7 @@ model ProductVariantOption {
 }
 
 model ProductVariantOptionValue {
-  id       String @id @default(cuid())
+  id       String               @id @default(cuid())
   optionId String
   option   ProductVariantOption @relation(references: [id], fields: [optionId], onDelete: Cascade)
 
@@ -135,11 +135,11 @@ model ProductVariantOptionValue {
 }
 
 model ProductVariant {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
   product   Product @relation(references: [id], fields: [productId], onDelete: Cascade)
 
-  title       String  // e.g., "8oz / Hot", "12oz / Cold"
+  title       String // e.g., "8oz / Hot", "12oz / Cold"
   sku         String
   price       Float?
   isDefault   Boolean @default(false)
@@ -158,11 +158,11 @@ model ProductVariant {
 }
 
 model ProductVariantValue {
-  id               String @id @default(cuid())
-  variantId        String
-  variant          ProductVariant @relation(references: [id], fields: [variantId], onDelete: Cascade)
-  optionValueId    String
-  optionValue      ProductVariantOptionValue @relation(references: [id], fields: [optionValueId], onDelete: Cascade)
+  id            String                    @id @default(cuid())
+  variantId     String
+  variant       ProductVariant            @relation(references: [id], fields: [variantId], onDelete: Cascade)
+  optionValueId String
+  optionValue   ProductVariantOptionValue @relation(references: [id], fields: [optionValueId], onDelete: Cascade)
 
   @@unique([variantId, optionValueId])
   @@index([variantId])

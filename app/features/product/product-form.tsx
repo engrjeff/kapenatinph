@@ -41,12 +41,14 @@ export interface ProductFormProps {
   initialValue?: any;
   categories: ProductCategory[];
   isEditing?: boolean;
+  isDuplicating?: boolean;
 }
 
 export function ProductForm({
   initialValue,
   categories,
   isEditing = false,
+  isDuplicating = false,
 }: ProductFormProps) {
   const [hasVariants, setHasVariants] = useState(
     initialValue?.hasVariants ?? false
@@ -55,10 +57,10 @@ export function ProductForm({
   const form = useForm<ProductInputs>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: initialValue?.name ?? '',
+      name: isDuplicating ? '' : (initialValue?.name ?? ''),
       description: initialValue?.description ?? '',
       categoryId: initialValue?.categoryId ?? '',
-      sku: initialValue?.sku ?? '',
+      sku: isDuplicating ? '' : (initialValue?.sku ?? ''),
       basePrice: initialValue?.basePrice ?? undefined,
       isActive: initialValue?.isActive ?? true,
       hasVariants: initialValue?.hasVariants ?? false,
@@ -425,13 +427,13 @@ export function ProductForm({
                       key={field.id}
                       className="border rounded-lg p-4 space-y-4"
                     >
-                      <div className="flex items-center gap-3">
-                        <GripVerticalIcon className="size-4 text-muted-foreground" />
-                        <FormField
-                          control={form.control}
-                          name={`variantOptions.${optionIndex}.name`}
-                          render={({ field }) => (
-                            <FormItem className="flex-1">
+                      <FormField
+                        control={form.control}
+                        name={`variantOptions.${optionIndex}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center gap-3">
+                              <GripVerticalIcon className="size-4 text-muted-foreground" />
                               <FormLabel className="sr-only">
                                 Option Name
                               </FormLabel>
@@ -441,21 +443,21 @@ export function ProductForm({
                                   {...field}
                                 />
                               </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="shrink-0"
-                          aria-label="Delete option"
-                          onClick={() => removeOption(optionIndex)}
-                        >
-                          <TrashIcon className="size-4" />
-                        </Button>
-                      </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="shrink-0"
+                                aria-label="Delete option"
+                                onClick={() => removeOption(optionIndex)}
+                              >
+                                <TrashIcon className="size-4" />
+                              </Button>
+                            </div>
+                            <FormMessage className="ml-9" />
+                          </FormItem>
+                        )}
+                      />
 
                       {/* Option Values */}
                       <div className="ml-7 space-y-2">

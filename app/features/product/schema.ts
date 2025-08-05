@@ -14,7 +14,25 @@ export const variantOptionSchema = z.object({
     .string({ error: 'Option name is required' })
     .min(1, { message: 'Option name is required' }),
   position: z.number(),
-  values: z.array(variantOptionValueSchema).min(1, { message: 'At least one option value is required' }),
+  values: z
+    .array(variantOptionValueSchema)
+    .min(1, { message: 'At least one option value is required' })
+    .superRefine((items, ctx) => {
+      const uniqueItemsCount = new Set(
+        items.map((item) => item.value.toLowerCase())
+      ).size;
+      const errorPosition = items.length - 1;
+
+      const target = items[errorPosition];
+
+      if (uniqueItemsCount !== items.length) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${target.value} already exists.`,
+          path: [errorPosition, 'value'],
+        });
+      }
+    }),
 });
 
 // Individual variant schema (e.g., "8oz / Hot")
@@ -56,12 +74,25 @@ export const productSchema = z
         .number({ error: 'Base price is required' })
         .nonnegative({ message: 'Base price cannot be negative' })
     ) as unknown as z.ZodNumber,
-    sku: z
-      .string()
-      .optional(), // SKU for products without variants
+    sku: z.string().optional(), // SKU for products without variants
     isActive: z.boolean(),
     hasVariants: z.boolean(),
-    variantOptions: z.array(variantOptionSchema),
+    variantOptions: z.array(variantOptionSchema).superRefine((items, ctx) => {
+      const uniqueItemsCount = new Set(
+        items.map((item) => item.name.toLowerCase())
+      ).size;
+      const errorPosition = items.length - 1;
+
+      const target = items[errorPosition];
+
+      if (uniqueItemsCount !== items.length) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${target.name} already exists.`,
+          path: [errorPosition, 'name'],
+        });
+      }
+    }),
     variants: z.array(productVariantSchema),
   })
   .refine(
