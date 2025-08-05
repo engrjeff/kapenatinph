@@ -7,3 +7,8 @@
 
 # Vercel
 /.vercel/
+
+.env.local
+.env
+
+/generated/prisma
