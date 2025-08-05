@@ -12,7 +12,6 @@ import {
   type SubmitErrorHandler,
   type SubmitHandler,
 } from 'react-hook-form';
-import { useFetcher } from 'react-router';
 import { Button } from '~/components/ui/button';
 import {
   Form,
@@ -30,6 +29,7 @@ import { SubmitButton } from '~/components/ui/submit-button';
 import { Switch } from '~/components/ui/switch';
 import { Textarea } from '~/components/ui/textarea';
 import type { ProductCategory } from '~/generated/prisma/client';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 import { generateSku } from '~/lib/utils';
 import {
   productSchema,
@@ -83,7 +83,11 @@ export function ProductForm({
     name: 'variants',
   });
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithResponseHandler<ProductInputs>({
+    redirectTo: '/products',
+    form,
+  });
+
   const isLoading = fetcher.state !== 'idle';
 
   // Generate variant combinations when options change

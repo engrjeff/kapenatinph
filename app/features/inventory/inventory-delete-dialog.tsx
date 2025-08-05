@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react';
-import { useFetcher } from 'react-router';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,12 +10,22 @@ import {
 } from '~/components/ui/alert-dialog';
 import { SubmitButton } from '~/components/ui/submit-button';
 import type { Inventory } from '~/generated/prisma/client';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 
 export function InventoryDeleteDialog({
   inventory,
   ...dialogProps
 }: ComponentProps<typeof AlertDialog> & { inventory: Inventory }) {
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithResponseHandler();
+
+  async function handleSubmit() {
+    fetcher.submit(
+      { id: inventory.id, intent: 'delete' },
+      { method: 'POST', action: '/inventory', encType: 'application/json' }
+    );
+
+    dialogProps.onOpenChange?.(false);
+  }
 
   return (
     <AlertDialog {...dialogProps}>
@@ -30,16 +39,13 @@ export function InventoryDeleteDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <fetcher.Form action="/inventory" method="POST">
-            <SubmitButton
-              variant="destructive"
-              loading={fetcher.state !== 'idle'}
-            >
-              Continue
-            </SubmitButton>
-            <input type="hidden" hidden name="intent" defaultValue="delete" />
-            <input type="hidden" hidden name="id" defaultValue={inventory.id} />
-          </fetcher.Form>
+          <SubmitButton
+            variant="destructive"
+            loading={fetcher.state !== 'idle'}
+            onClick={handleSubmit}
+          >
+            Continue
+          </SubmitButton>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

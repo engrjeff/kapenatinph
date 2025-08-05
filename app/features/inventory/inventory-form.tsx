@@ -5,7 +5,6 @@ import {
   type SubmitErrorHandler,
   type SubmitHandler,
 } from 'react-hook-form';
-import { useFetcher } from 'react-router';
 import { Button } from '~/components/ui/button';
 import {
   Form,
@@ -22,6 +21,7 @@ import { SelectNative } from '~/components/ui/select-native';
 import { SubmitButton } from '~/components/ui/submit-button';
 import { Textarea } from '~/components/ui/textarea';
 import type { Category, Inventory } from '~/generated/prisma/client';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 import { COMMON_UNITS } from '~/lib/constants';
 import { generateSku } from '~/lib/utils';
 import { inventorySchema, type InventoryInputs } from './schema';
@@ -40,8 +40,12 @@ export function InventoryForm({
   const form = useForm<InventoryInputs>({
     resolver: zodResolver(inventorySchema),
     defaultValues: {
-      name: isEditing ? initialValue?.name ?? '' : initialValue?.name ? initialValue?.name + ' Copy' : '',
-      sku: isEditing ? initialValue?.sku ?? '' : '',
+      name: isEditing
+        ? (initialValue?.name ?? '')
+        : initialValue?.name
+          ? initialValue?.name + ' Copy'
+          : '',
+      sku: isEditing ? (initialValue?.sku ?? '') : '',
       description: initialValue?.description ?? '',
       categoryId: initialValue?.categoryId ?? '',
       unit: initialValue?.unit ?? '',
@@ -52,7 +56,10 @@ export function InventoryForm({
     },
   });
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithResponseHandler<InventoryInputs>({
+    redirectTo: '/inventory',
+    form,
+  });
 
   const isLoading = fetcher.state !== 'idle';
 

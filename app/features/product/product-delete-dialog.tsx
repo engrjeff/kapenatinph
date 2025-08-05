@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useFetcher } from 'react-router';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +11,7 @@ import {
   AlertDialogTrigger,
 } from '~/components/ui/alert-dialog';
 import type { Product } from '~/generated/prisma/client';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 
 interface ProductDeleteDialogProps {
   trigger: React.ReactNode;
@@ -23,7 +23,11 @@ export function ProductDeleteDialog({
   product,
 }: ProductDeleteDialogProps) {
   const [open, setOpen] = useState(false);
-  const fetcher = useFetcher();
+
+  const fetcher = useFetcherWithResponseHandler({
+    redirectTo: '/products',
+  });
+
   const isLoading = fetcher.state !== 'idle';
 
   const handleDelete = () => {

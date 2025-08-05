@@ -1,5 +1,5 @@
 import { PackageIcon, PlusIcon, SettingsIcon } from 'lucide-react';
-import { Link, redirect } from 'react-router';
+import { data, Link } from 'react-router';
 import z from 'zod';
 import { PageTitle } from '~/components/page-title';
 import { Button } from '~/components/ui/button';
@@ -10,6 +10,8 @@ import {
   updateProductSchema,
 } from '~/features/product/schema';
 import { productService } from '~/features/product/service';
+import { handleActionError } from '~/lib/errorHandler';
+import type { ActionResponse } from '~/lib/types';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/products';
 
@@ -26,38 +28,27 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 export async function action(args: Route.ActionArgs) {
-  const userId = await requireAuth(args);
+  try {
+    const userId = await requireAuth(args);
 
-  let requestData = await args.request.json();
+    let requestData = await args.request.json();
 
-  const validationResult = z
-    .discriminatedUnion('intent', [
-      createProductSchema,
-      updateProductSchema,
-      deleteProductSchema,
-    ])
-    .safeParse(requestData);
+    const validationResult = z
+      .discriminatedUnion('intent', [
+        createProductSchema,
+        updateProductSchema,
+        deleteProductSchema,
+      ])
+      .safeParse(requestData);
 
-  if (!validationResult.success) {
-    return z.treeifyError(validationResult.error).properties;
-  }
+    if (!validationResult.success) {
+      return z.treeifyError(validationResult.error).properties;
+    }
 
-  const { intent } = validationResult.data;
+    const { intent } = validationResult.data;
 
-  if (intent === 'create') {
-    const {
-      name,
-      description,
-      categoryId,
-      sku,
-      basePrice,
-      isActive,
-      hasVariants,
-      variantOptions,
-      variants,
-    } = validationResult.data;
-    await productService.createProduct(
-      {
+    if (intent === 'create') {
+      const {
         name,
         description,
         categoryId,
@@ -67,28 +58,35 @@ export async function action(args: Route.ActionArgs) {
         hasVariants,
         variantOptions,
         variants,
-      },
-      userId
-    );
-    return redirect('/products');
-  }
+      } = validationResult.data;
 
-  if (intent === 'update') {
-    const {
-      id,
-      name,
-      description,
-      categoryId,
-      sku,
-      basePrice,
-      isActive,
-      hasVariants,
-      variantOptions,
-      variants,
-    } = validationResult.data;
-    await productService.updateProduct(
-      id,
-      {
+      const product = await productService.createProduct(
+        {
+          name,
+          description,
+          categoryId,
+          sku,
+          basePrice,
+          isActive,
+          hasVariants,
+          variantOptions,
+          variants,
+        },
+        userId
+      );
+
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: product,
+      };
+
+      return data(response, { status: 201 });
+    }
+
+    if (intent === 'update') {
+      const {
+        id,
         name,
         description,
         categoryId,
@@ -98,15 +96,56 @@ export async function action(args: Route.ActionArgs) {
         hasVariants,
         variantOptions,
         variants,
-      },
-      userId
-    );
-    return redirect('/products');
-  }
+      } = validationResult.data;
 
-  if (intent === 'delete') {
-    await productService.deleteProduct(validationResult.data.id, userId);
-    return redirect('/products');
+      const product = await productService.updateProduct(
+        id,
+        {
+          name,
+          description,
+          categoryId,
+          sku,
+          basePrice,
+          isActive,
+          hasVariants,
+          variantOptions,
+          variants,
+        },
+        userId
+      );
+
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: product,
+      };
+
+      return data(response, { status: 200 });
+    }
+
+    if (intent === 'delete') {
+      await productService.deleteProduct(validationResult.data.id, userId);
+
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: {},
+      };
+
+      return data(response, { status: 200 });
+    }
+  } catch (error) {
+    const errorResponse = handleActionError(error);
+
+    const response: ActionResponse = {
+      success: false,
+      error: errorResponse.error,
+      message: errorResponse.message,
+      statusCode: errorResponse.statusCode,
+      field: errorResponse.field,
+    };
+
+    return data(response, { status: errorResponse.statusCode });
   }
 }
 

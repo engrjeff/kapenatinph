@@ -127,5 +127,5 @@ export async function updateInventory({
 }
 
 export async function deleteInventory(id: string) {
-  await prisma.inventory.delete({ where: { id } });
+  return prisma.inventory.delete({ where: { id } });
 }

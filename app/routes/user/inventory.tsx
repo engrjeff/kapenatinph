@@ -1,5 +1,5 @@
 import { PackageIcon, PlusIcon } from 'lucide-react';
-import { Link, redirect } from 'react-router';
+import { data, Link } from 'react-router';
 import z from 'zod';
 import { DataPagination } from '~/components/data-pagination';
 import { PageTitle } from '~/components/page-title';
@@ -10,17 +10,19 @@ import { InventoryStatusFilter } from '~/features/inventory/inventory-status-fil
 import { InventoryTable } from '~/features/inventory/inventory-table';
 import {
   createInventorySchema,
-  updateInventorySchema,
   deleteInventorySchema,
+  updateInventorySchema,
 } from '~/features/inventory/schema';
 import {
   createInventory,
-  updateInventory,
   deleteInventory,
   getInventoryItems,
   getInventoryItemsCountByStatus,
+  updateInventory,
 } from '~/features/inventory/service';
 import { InventoryStatus } from '~/generated/prisma/enums';
+import { handleActionError } from '~/lib/errorHandler';
+import type { ActionResponse } from '~/lib/types';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/inventory';
 
@@ -63,71 +65,27 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 export async function action(args: Route.ActionArgs) {
-  const userId = await requireAuth(args);
+  try {
+    const userId = await requireAuth(args);
 
-  const requestData = await args.request.json();
+    const requestData = await args.request.json();
 
-  const validationResult = z
-    .discriminatedUnion('intent', [
-      createInventorySchema,
-      updateInventorySchema,
-      deleteInventorySchema,
-    ])
-    .safeParse(requestData);
+    const validationResult = z
+      .discriminatedUnion('intent', [
+        createInventorySchema,
+        updateInventorySchema,
+        deleteInventorySchema,
+      ])
+      .safeParse(requestData);
 
-  if (!validationResult.success) {
-    return z.treeifyError(validationResult.error).properties;
-  }
+    if (!validationResult.success) {
+      return z.treeifyError(validationResult.error).properties;
+    }
 
-  const { intent } = validationResult.data;
+    const { intent } = validationResult.data;
 
-  if (intent === 'create') {
-    const {
-      name,
-      sku,
-      categoryId,
-      unit,
-      description,
-      quantity,
-      costPrice,
-      reorderLevel,
-      supplier,
-    } = validationResult.data;
-
-    const inventory = await createInventory({
-      name,
-      sku,
-      categoryId,
-      unit,
-      description,
-      quantity,
-      costPrice,
-      reorderLevel,
-      supplier,
-      userId,
-    });
-
-    return redirect('/inventory');
-  }
-
-  if (intent === 'update') {
-    const {
-      id,
-      name,
-      sku,
-      categoryId,
-      unit,
-      description,
-      quantity,
-      costPrice,
-      reorderLevel,
-      supplier,
-    } = validationResult.data;
-
-    await updateInventory({
-      id,
-      userId,
-      data: {
+    if (intent === 'create') {
+      const {
         name,
         sku,
         categoryId,
@@ -137,23 +95,96 @@ export async function action(args: Route.ActionArgs) {
         costPrice,
         reorderLevel,
         supplier,
-      },
-    });
+      } = validationResult.data;
 
-    return redirect('/inventory');
-  }
+      const inventory = await createInventory({
+        name,
+        sku,
+        categoryId,
+        unit,
+        description,
+        quantity,
+        costPrice,
+        reorderLevel,
+        supplier,
+        userId,
+      });
 
-  if (intent === 'delete') {
-    await deleteInventory(validationResult.data.id);
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: inventory,
+      };
 
-    return validationResult.data.id;
+      return data(response, { status: 201 });
+    }
+
+    if (intent === 'update') {
+      const {
+        id,
+        name,
+        sku,
+        categoryId,
+        unit,
+        description,
+        quantity,
+        costPrice,
+        reorderLevel,
+        supplier,
+      } = validationResult.data;
+
+      const inventory = await updateInventory({
+        id,
+        userId,
+        data: {
+          name,
+          sku,
+          categoryId,
+          unit,
+          description,
+          quantity,
+          costPrice,
+          reorderLevel,
+          supplier,
+        },
+      });
+
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: inventory,
+      };
+
+      return data(response, { status: 200 });
+    }
+
+    if (intent === 'delete') {
+      await deleteInventory(validationResult.data.id);
+
+      const response: ActionResponse = {
+        success: true,
+        intent,
+        data: {},
+      };
+
+      return data(response, { status: 200 });
+    }
+  } catch (error) {
+    const errorResponse = handleActionError(error);
+
+    const response: ActionResponse = {
+      success: false,
+      error: errorResponse.error,
+      message: errorResponse.message,
+      statusCode: errorResponse.statusCode,
+      field: errorResponse.field,
+    };
+
+    return data(response, { status: errorResponse.statusCode });
   }
 }
 
-export default function InventoryPage({
-  loaderData,
-  actionData,
-}: Route.ComponentProps) {
+export default function InventoryPage({ loaderData }: Route.ComponentProps) {
   const {
     inventoryItems,
     pageInfo,
@@ -165,7 +196,6 @@ export default function InventoryPage({
   if (pageInfo.total === 0)
     return (
       <>
-        {actionData ? <pre>{JSON.stringify(actionData, null, 2)}</pre> : null}
         <PageTitle title="Inventory" subtitle="Manage your shop inventory" />
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed rounded-md">
           <div className="mb-4 p-3 rounded-full bg-muted/50 dark:bg-muted/20">
