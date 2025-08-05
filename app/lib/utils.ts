@@ -22,6 +22,7 @@ export const formatDate = (dateString: string) => {
 
 export function generateSku(fromStr: string, ...others: string[]) {
   return fromStr
+    .replaceAll('/', '')
     .replaceAll('-', ' ')
     .split(' ')
     .filter(Boolean)
