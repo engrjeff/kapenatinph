@@ -1,3 +1,4 @@
+import pluralize from 'pluralize';
 import { InventoryStatus } from '~/generated/prisma/enums';
 import type { InventoryCreateArgs } from '~/generated/prisma/models';
 import { PAGINATION } from '~/lib/constants';
@@ -49,7 +50,10 @@ export async function getInventoryItems({
       page,
       limit,
     },
-    data: inventoryItems,
+    data: inventoryItems.map((i) => ({
+      ...i,
+      unit: pluralize(i.unit, i.quantity),
+    })),
   };
 }
 
@@ -106,9 +110,10 @@ export async function updateInventory({
   userId: string;
   data: Partial<InventoryCreateArgs['data']>;
 }) {
-  const status = data.quantity !== undefined && data.reorderLevel !== undefined
-    ? determineInventoryStatus(data.quantity, data.reorderLevel)
-    : undefined;
+  const status =
+    data.quantity !== undefined && data.reorderLevel !== undefined
+      ? determineInventoryStatus(data.quantity, data.reorderLevel)
+      : undefined;
 
   const inventory = await prisma.inventory.update({
     where: { id, userId },
