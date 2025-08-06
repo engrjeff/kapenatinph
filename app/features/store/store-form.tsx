@@ -4,8 +4,6 @@ import {
   type SubmitErrorHandler,
   type SubmitHandler,
 } from 'react-hook-form';
-import { useFetcher } from 'react-router';
-import { toast } from 'sonner';
 import {
   Form,
   FormControl,
@@ -17,11 +15,12 @@ import {
 import { Input } from '~/components/ui/input';
 import { SubmitButton } from '~/components/ui/submit-button';
 import { Textarea } from '~/components/ui/textarea';
-import { createStoreSchema, type CreateStoreInputs } from './schema';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
+import { storeSchema, type StoreInputs } from './schema';
 
 export function StoreForm() {
-  const form = useForm<CreateStoreInputs>({
-    resolver: zodResolver(createStoreSchema),
+  const form = useForm<StoreInputs>({
+    resolver: zodResolver(storeSchema),
     defaultValues: {
       name: '',
       address: '',
@@ -32,37 +31,21 @@ export function StoreForm() {
     },
   });
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithResponseHandler<StoreInputs>();
 
-  const onError: SubmitErrorHandler<CreateStoreInputs> = (errors) => {
+  const onError: SubmitErrorHandler<StoreInputs> = (errors) => {
     console.log(`Store Form Errors: `, errors);
   };
 
-  const onSubmit: SubmitHandler<CreateStoreInputs> = async (data) => {
-    try {
-      const formData = new FormData();
-
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          formData.append(key, String(value));
-        }
-      });
-
-      fetcher.submit(formData, { method: 'POST' });
-
-      // const result = await createStore(data);
-
-      // if (result.id) {
-      //   toast.success('Store saved!');
-
-      //   // create default categories
-      //   await createDefaultCategories();
-
-      //   navigate('/inventory', { replace: true });
-      // }
-    } catch (error) {
-      toast.error('Error');
-    }
+  const onSubmit: SubmitHandler<StoreInputs> = async (data) => {
+    fetcher.submit(
+      { ...data, intent: 'create' },
+      {
+        method: 'POST',
+        action: '/onboarding',
+        encType: 'application/json',
+      }
+    );
   };
 
   return (
@@ -155,7 +138,7 @@ export function StoreForm() {
               </FormItem>
             )}
           />
-          <div className="pt-6">
+          <div className="pt-4">
             <SubmitButton
               loading={fetcher.state === 'submitting'}
               className="w-full"

@@ -11,9 +11,8 @@ export default [
     route('sign-in/*', 'routes/site/sign-in.tsx'),
     route('sign-up/*', 'routes/site/sign-up.tsx'),
   ]),
+  route('onboarding', 'routes/user/onboarding.tsx'),
   layout('routes/user/user-pages-layout.tsx', [
-    route('onboarding', 'routes/user/onboarding.tsx'),
-
     route('dashboard', 'routes/user/dashboard.tsx'),
 
     route('inventory', 'routes/user/inventory.tsx'),
