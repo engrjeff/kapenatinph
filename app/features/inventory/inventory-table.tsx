@@ -1,5 +1,4 @@
 import { PackageIcon } from 'lucide-react';
-import pluralize from 'pluralize';
 import { Link } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import {
@@ -32,7 +31,7 @@ export function InventoryTable({
               <TableHead>Category</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Cost Price</TableHead>
+              <TableHead>Unit Price</TableHead>
               <TableHead>Supplier</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
@@ -91,15 +90,15 @@ export function InventoryTable({
                       >
                         {item.quantity}
                       </span>{' '}
-                      <span className="text-muted-foreground">
-                        {pluralize(item.unit, item.quantity)}
-                      </span>
+                      <span className="text-muted-foreground">{item.unit}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <InventoryStatusBadge status={item.status} />
                   </TableCell>
-                  <TableCell>{formatCurrency(item.costPrice)}</TableCell>
+                  <TableCell className="font-mono">
+                    {formatCurrency(item.unitPrice)}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {item.supplier || '-'}
                   </TableCell>

@@ -1,12 +1,10 @@
 import {
   ArrowLeftIcon,
   ClockIcon,
-  DollarSignIcon,
   PackageIcon,
   PencilIcon,
   TagIcon,
 } from 'lucide-react';
-import pluralize from 'pluralize';
 import { data, Link } from 'react-router';
 import { PageTitle } from '~/components/page-title';
 import { Badge } from '~/components/ui/badge';
@@ -119,8 +117,7 @@ export default function RecipeDetailsPage({
                     Total Cost
                   </p>
                   <div className="flex items-center gap-2">
-                    <DollarSignIcon className="size-4 text-muted-foreground" />
-                    <span className="text-sm font-semibold">
+                    <span className="text-lg font-semibold font-mono">
                       {formatCurrency(recipe.totalCost)}
                     </span>
                   </div>
@@ -200,7 +197,6 @@ export default function RecipeDetailsPage({
                       <TableHead>#</TableHead>
                       <TableHead>Ingredient</TableHead>
                       <TableHead>Quantity</TableHead>
-                      <TableHead>Unit</TableHead>
                       <TableHead>Cost per Unit</TableHead>
                       <TableHead>Total Cost</TableHead>
                       <TableHead>Notes</TableHead>
@@ -209,7 +205,9 @@ export default function RecipeDetailsPage({
                   <TableBody>
                     {recipe.ingredients.map((ingredient, index) => {
                       const totalCost =
-                        ingredient.inventory.costPrice * ingredient.quantity;
+                        (ingredient.inventory.unitPrice /
+                          ingredient.inventory.measurementPerUnit) *
+                        ingredient.quantity;
                       return (
                         <TableRow key={ingredient.id}>
                           <TableCell className="font-medium">
@@ -218,14 +216,19 @@ export default function RecipeDetailsPage({
                           <TableCell className="font-medium">
                             {ingredient.inventory.name}
                           </TableCell>
-                          <TableCell>{ingredient.quantity}</TableCell>
-                          <TableCell>
-                            {pluralize(ingredient.unit, ingredient.quantity)}
+                          <TableCell className="font-mono">
+                            {ingredient.quantity}
+                            <span className="text-muted-foreground">
+                              {ingredient.unit}
+                            </span>
                           </TableCell>
-                          <TableCell>
-                            {formatCurrency(ingredient.inventory.costPrice)}
+                          <TableCell className="font-mono">
+                            {formatCurrency(ingredient.inventory.unitPrice)}
+                            <span className="text-xs text-muted-foreground">
+                              /{ingredient.inventory.unit}
+                            </span>
                           </TableCell>
-                          <TableCell className="font-medium">
+                          <TableCell className="font-medium font-mono">
                             {formatCurrency(totalCost)}
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
@@ -234,6 +237,14 @@ export default function RecipeDetailsPage({
                         </TableRow>
                       );
                     })}
+                    <TableRow className="bg-accent hover:bg-accent">
+                      <TableCell colSpan={3}></TableCell>
+                      <TableCell>Total</TableCell>
+                      <TableCell className="font-mono">
+                        {formatCurrency(recipe.totalCost)}
+                      </TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </div>
@@ -249,7 +260,7 @@ export default function RecipeDetailsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-2xl font-bold text-primary font-mono">
                   {formatCurrency(recipe.totalCost)}
                 </div>
                 <div className="text-sm text-muted-foreground">Total Cost</div>

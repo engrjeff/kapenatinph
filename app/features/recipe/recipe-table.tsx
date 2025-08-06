@@ -122,7 +122,7 @@ export function RecipeTable({ data }: { data: Array<RecipeWithDetails> }) {
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium">
+                    <span className="font-medium font-mono">
                       {formatCurrency(recipe.totalCost)}
                     </span>
                   </TableCell>

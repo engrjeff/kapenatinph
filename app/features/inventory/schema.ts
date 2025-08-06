@@ -45,12 +45,18 @@ export const inventorySchema = z.object({
     )
     .optional() as unknown as z.ZodOptional<z.ZodNumber>,
 
-  costPrice: z.preprocess(
+  unitPrice: z.preprocess(
     (val) => (val === '' ? undefined : Number(val)),
     z
-      .number({ error: 'Cost price is required' })
-      .int({ error: 'Must be a whole number' })
-      .nonnegative({ message: 'Cost price cannot be negative' })
+      .number({ error: 'Unit price is required' })
+      .nonnegative({ message: 'Unit price cannot be negative' })
+  ) as unknown as z.ZodNumber,
+
+  measurementPerUnit: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z
+      .number({ error: 'Measurement per unit is required' })
+      .nonnegative({ message: 'Measurement per unit cannot be negative' })
   ) as unknown as z.ZodNumber,
 
   supplier: z

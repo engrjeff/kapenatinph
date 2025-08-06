@@ -51,7 +51,8 @@ export function InventoryForm({
       unit: initialValue?.unit ?? '',
       quantity: initialValue?.quantity ?? undefined,
       reorderLevel: initialValue?.reorderLevel ?? undefined,
-      costPrice: initialValue?.costPrice ?? undefined,
+      unitPrice: initialValue?.unitPrice ?? undefined,
+      measurementPerUnit: initialValue?.unitPrice ?? undefined,
       supplier: initialValue?.supplier ?? '',
     },
   });
@@ -129,34 +130,64 @@ export function InventoryForm({
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="sku"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>SKU</FormLabel>
+                <div className="relative">
+                  <FormControl>
+                    <Input placeholder="SKU" {...field} />
+                  </FormControl>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="secondary"
+                    className="absolute inset-y-1 end-1 size-7 disabled:cursor-not-allowed"
+                    title="click to generate SKU"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      const skuValue = generateSku(form.watch('name'));
+                      form.setValue('sku', skuValue);
+                      await form.trigger('sku');
+                    }}
+                  >
+                    <span className="sr-only">generate sku</span>
+                    <RotateCwIcon className="size-4" />
+                  </Button>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description (Optional)</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <p className="font-semibold text-sm">Quantity & Pricing</p>
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 items-start">
             <FormField
               control={form.control}
-              name="sku"
+              name="unitPrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>SKU</FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Input placeholder="SKU" {...field} />
-                    </FormControl>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="secondary"
-                      className="absolute inset-y-1 end-1 size-7 disabled:cursor-not-allowed"
-                      title="click to generate SKU"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        const skuValue = generateSku(form.watch('name'));
-                        form.setValue('sku', skuValue);
-                        await form.trigger('sku');
-                      }}
-                    >
-                      <span className="sr-only">generate sku</span>
-                      <RotateCwIcon className="size-4" />
-                    </Button>
-                  </div>
+                  <FormLabel>Unit Price</FormLabel>
+                  <FormControl>
+                    <NumberInput min={0} placeholder="0" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -181,31 +212,26 @@ export function InventoryForm({
                 </FormItem>
               )}
             />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description (Optional)</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Description" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <p className="font-semibold text-sm">Quantity & Pricing</p>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 items-start">
+            <FormField
+              control={form.control}
+              name="measurementPerUnit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Measurement per Price</FormLabel>
+                  <FormControl>
+                    <NumberInput min={0} placeholder="0" {...field} />
+                  </FormControl>
+                  <FormDescription>e.g. 1 unit of Milk = 120g</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Quantity</FormLabel>
+                  <FormLabel>Quantity/Stock</FormLabel>
                   <FormControl>
                     <NumberInput
                       step={1}
@@ -219,20 +245,8 @@ export function InventoryForm({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="costPrice"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cost</FormLabel>
-                  <FormControl>
-                    <NumberInput step={1} min={0} placeholder="0" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+
           <FormField
             control={form.control}
             name="reorderLevel"

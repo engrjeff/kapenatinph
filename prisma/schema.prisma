@@ -182,15 +182,16 @@ model Inventory {
   categoryId String
   category   Category @relation(references: [id], fields: [categoryId])
 
-  name         String
-  sku          String
-  description  String?
-  unit         String
-  quantity     Int
-  reorderLevel Int?            @default(0)
-  costPrice    Float
-  supplier     String?
-  status       InventoryStatus @default(IN_STOCK)
+  name               String
+  sku                String
+  description        String?
+  unit               String
+  measurementPerUnit Float           @default(0) // e.g. 1 unit = 120g
+  quantity           Int
+  reorderLevel       Int?            @default(0)
+  unitPrice          Float           @default(0)
+  supplier           String?
+  status             InventoryStatus @default(IN_STOCK)
 
   // Recipe ingredients relation
   recipeIngredients RecipeIngredient[]

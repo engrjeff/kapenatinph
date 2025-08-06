@@ -61,7 +61,7 @@ function UserPagesLayout({ loaderData }: Route.ComponentProps) {
       <AppHeader />
       {!isOnboarding && <Sidebar />}
       <main
-        className={`pt-20 pb-6 px-6 h-screen overflow-y-auto ${!isOnboarding ? 'ml-64' : ''}`}
+        className={`pt-20 pb-6 px-6 min-h-screen ${!isOnboarding ? 'ml-64' : ''}`}
       >
         <div className="max-w-full mx-auto space-y-6">
           <Outlet />

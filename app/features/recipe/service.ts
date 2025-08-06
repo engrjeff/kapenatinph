@@ -1,5 +1,5 @@
-import prisma from '~/lib/prisma';
 import { PAGINATION } from '~/lib/constants';
+import prisma from '~/lib/prisma';
 import { getSkip } from '~/lib/utils.server';
 import type { RecipeInputs } from './schema';
 
@@ -23,7 +23,9 @@ export const recipeService = {
   }: GetRecipesArgs) {
     const where = {
       userId,
-      ...(search && { name: { contains: search, mode: 'insensitive' as const } }),
+      ...(search && {
+        name: { contains: search, mode: 'insensitive' as const },
+      }),
       ...(productId && { productId }),
       ...(isActive !== undefined && { isActive }),
     };
@@ -33,16 +35,27 @@ export const recipeService = {
     const recipes = await prisma.recipe.findMany({
       where,
       include: {
-        product: { select: { name: true, category: { select: { name: true } } } },
-        productVariant: { 
-          select: { 
-            title: true, 
-            product: { select: { name: true, category: { select: { name: true } } } } 
-          } 
+        product: {
+          select: { name: true, category: { select: { name: true } } },
+        },
+        productVariant: {
+          select: {
+            title: true,
+            product: {
+              select: { name: true, category: { select: { name: true } } },
+            },
+          },
         },
         ingredients: {
           include: {
-            inventory: { select: { name: true, unit: true, costPrice: true } },
+            inventory: {
+              select: {
+                name: true,
+                unit: true,
+                unitPrice: true,
+                measurementPerUnit: true,
+              },
+            },
           },
         },
         _count: {
@@ -68,17 +81,37 @@ export const recipeService = {
     return await prisma.recipe.findFirst({
       where: { id, userId },
       include: {
-        product: { select: { id: true, name: true, category: { select: { name: true } } } },
-        productVariant: { 
-          select: { 
+        product: {
+          select: {
             id: true,
-            title: true, 
-            product: { select: { id: true, name: true, category: { select: { name: true } } } } 
-          } 
+            name: true,
+            category: { select: { name: true } },
+          },
+        },
+        productVariant: {
+          select: {
+            id: true,
+            title: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                category: { select: { name: true } },
+              },
+            },
+          },
         },
         ingredients: {
           include: {
-            inventory: { select: { id: true, name: true, unit: true, costPrice: true } },
+            inventory: {
+              select: {
+                id: true,
+                name: true,
+                unit: true,
+                unitPrice: true,
+                measurementPerUnit: true,
+              },
+            },
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -101,16 +134,18 @@ export const recipeService = {
 
       // Add ingredients and calculate total cost
       let totalCost = 0;
-      
+
       for (const ingredient of ingredients) {
         // Get inventory item to calculate cost
         const inventoryItem = await tx.inventory.findUnique({
           where: { id: ingredient.inventoryId },
-          select: { costPrice: true, unit: true },
+          select: { unitPrice: true, measurementPerUnit: true, unit: true },
         });
 
         if (!inventoryItem) {
-          throw new Error(`Inventory item not found: ${ingredient.inventoryId}`);
+          throw new Error(
+            `Inventory item not found: ${ingredient.inventoryId}`
+          );
         }
 
         await tx.recipeIngredient.create({
@@ -125,7 +160,9 @@ export const recipeService = {
 
         // Calculate pro-rated cost for this ingredient
         // Assuming the inventory costPrice is per unit and we need to calculate based on quantity
-        const ingredientCost = (inventoryItem.costPrice / 1) * ingredient.quantity; // Simple calculation
+        const ingredientCost =
+          (inventoryItem.unitPrice / inventoryItem.measurementPerUnit) *
+          ingredient.quantity; // Simple calculation
         totalCost += ingredientCost;
       }
 
@@ -134,16 +171,27 @@ export const recipeService = {
         where: { id: recipe.id },
         data: { totalCost },
         include: {
-          product: { select: { name: true, category: { select: { name: true } } } },
-          productVariant: { 
-            select: { 
-              title: true, 
-              product: { select: { name: true, category: { select: { name: true } } } } 
-            } 
+          product: {
+            select: { name: true, category: { select: { name: true } } },
+          },
+          productVariant: {
+            select: {
+              title: true,
+              product: {
+                select: { name: true, category: { select: { name: true } } },
+              },
+            },
           },
           ingredients: {
             include: {
-              inventory: { select: { name: true, unit: true, costPrice: true } },
+              inventory: {
+                select: {
+                  name: true,
+                  unit: true,
+                  unitPrice: true,
+                  measurementPerUnit: true,
+                },
+              },
             },
           },
         },
@@ -170,16 +218,18 @@ export const recipeService = {
 
       // Add new ingredients and calculate total cost
       let totalCost = 0;
-      
+
       for (const ingredient of ingredients) {
         // Get inventory item to calculate cost
         const inventoryItem = await tx.inventory.findUnique({
           where: { id: ingredient.inventoryId },
-          select: { costPrice: true, unit: true },
+          select: { unitPrice: true, measurementPerUnit: true, unit: true },
         });
 
         if (!inventoryItem) {
-          throw new Error(`Inventory item not found: ${ingredient.inventoryId}`);
+          throw new Error(
+            `Inventory item not found: ${ingredient.inventoryId}`
+          );
         }
 
         await tx.recipeIngredient.create({
@@ -193,7 +243,9 @@ export const recipeService = {
         });
 
         // Calculate pro-rated cost for this ingredient
-        const ingredientCost = (inventoryItem.costPrice / 1) * ingredient.quantity;
+        const ingredientCost =
+          (inventoryItem.unitPrice / inventoryItem.measurementPerUnit) *
+          ingredient.quantity;
         totalCost += ingredientCost;
       }
 
@@ -202,16 +254,27 @@ export const recipeService = {
         where: { id: recipe.id },
         data: { totalCost },
         include: {
-          product: { select: { name: true, category: { select: { name: true } } } },
-          productVariant: { 
-            select: { 
-              title: true, 
-              product: { select: { name: true, category: { select: { name: true } } } } 
-            } 
+          product: {
+            select: { name: true, category: { select: { name: true } } },
+          },
+          productVariant: {
+            select: {
+              title: true,
+              product: {
+                select: { name: true, category: { select: { name: true } } },
+              },
+            },
           },
           ingredients: {
             include: {
-              inventory: { select: { name: true, unit: true, costPrice: true } },
+              inventory: {
+                select: {
+                  name: true,
+                  unit: true,
+                  unitPrice: true,
+                  measurementPerUnit: true,
+                },
+              },
             },
           },
         },

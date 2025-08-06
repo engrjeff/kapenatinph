@@ -87,7 +87,7 @@ export function ProductTable({
                   <Badge variant="secondary">{product.category.name}</Badge>
                 </TableCell>
                 <TableCell>
-                  <span className="font-medium">
+                  <span className="font-medium font-mono">
                     {formatCurrency(product.basePrice)}
                   </span>
                 </TableCell>

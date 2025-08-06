@@ -46,7 +46,7 @@ export async function loader(args: Route.LoaderArgs) {
     isActive,
   });
 
-  return { ...data };
+  return data;
 }
 
 export async function action(args: Route.ActionArgs) {
@@ -185,7 +185,8 @@ export default function RecipesPage({ loaderData }: Route.ComponentProps) {
             No recipes yet.
           </h3>
           <p className="text-sm text-muted-foreground mb-6 max-w-md leading-relaxed">
-            Start by creating your first coffee recipe with ingredient measurements.
+            Start by creating your first coffee recipe with ingredient
+            measurements.
           </p>
           <Button size="sm" asChild>
             <Link to="/recipes/new">
