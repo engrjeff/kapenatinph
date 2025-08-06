@@ -1,6 +1,4 @@
-import type { Route } from './+types/sales';
-
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Sales | Kape Natin PH' }];
 }
 

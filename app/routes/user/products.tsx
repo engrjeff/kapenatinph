@@ -31,7 +31,7 @@ export async function action(args: Route.ActionArgs) {
   try {
     const userId = await requireAuth(args);
 
-    let requestData = await args.request.json();
+    const requestData = await args.request.json();
 
     const validationResult = z
       .discriminatedUnion('intent', [

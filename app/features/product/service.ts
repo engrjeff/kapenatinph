@@ -104,7 +104,7 @@ export const productService = {
 
         // Create variants if provided
         for (const variant of variants) {
-          const createdVariant = await tx.productVariant.create({
+          await tx.productVariant.create({
             data: {
               productId: product.id,
               title: variant.title,
@@ -244,12 +244,20 @@ export const productService = {
   },
 
   // Helper function to generate all possible variant combinations
-  generateVariantCombinations(variantOptions: Array<{ name: string; values: Array<{ value: string }> }>) {
+  generateVariantCombinations(
+    variantOptions: Array<{ name: string; values: Array<{ value: string }> }>
+  ) {
     if (variantOptions.length === 0) return [];
 
-    const combinations: Array<{ title: string; options: Record<string, string> }> = [];
+    const combinations: Array<{
+      title: string;
+      options: Record<string, string>;
+    }> = [];
 
-    function generateCombos(index: number, currentCombo: Record<string, string>) {
+    function generateCombos(
+      index: number,
+      currentCombo: Record<string, string>
+    ) {
       if (index === variantOptions.length) {
         const title = Object.values(currentCombo).join(' / ');
         combinations.push({ title, options: { ...currentCombo } });
@@ -258,7 +266,10 @@ export const productService = {
 
       const option = variantOptions[index];
       for (const value of option.values) {
-        generateCombos(index + 1, { ...currentCombo, [option.name]: value.value });
+        generateCombos(index + 1, {
+          ...currentCombo,
+          [option.name]: value.value,
+        });
       }
     }
 

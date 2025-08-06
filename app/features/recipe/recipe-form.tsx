@@ -53,7 +53,7 @@ interface RecipeFormProps {
     id: string;
     name: string;
     unit: string;
-    costPrice: number;
+    unitPrice: number;
   }>;
   isEditing?: boolean;
 }

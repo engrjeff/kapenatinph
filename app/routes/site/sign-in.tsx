@@ -1,7 +1,6 @@
 import { SignIn } from '@clerk/react-router';
-import type { Route } from './+types/sign-in';
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Sign In | Kape Natin PH' }];
 }
 

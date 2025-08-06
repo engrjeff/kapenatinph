@@ -28,7 +28,10 @@ export function useFetcherWithResponseHandler<
         const error = actionData.message;
 
         if (actionData.field) {
-          args?.form?.setError(actionData.field as any, { message: error });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          args?.form?.setError(actionData.field as any, {
+            message: error,
+          });
         }
 
         toast.error(error);
@@ -50,7 +53,9 @@ export function useFetcherWithResponseHandler<
         }
       }
     }
-  }, [actionData, navigate]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actionData, args?.redirectTo, navigate]);
 
   return fetcher;
 }

@@ -1,6 +1,4 @@
-import type { Route } from './+types/dashboard';
-
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'Dashboard | Kape Natin PH' }];
 }
 

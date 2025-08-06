@@ -53,13 +53,13 @@ export function ProductCategoryDeleteDialog({
           <AlertDialogDescription>
             {hasProducts ? (
               <>
-                Cannot delete "{category.name}" because it contains{' '}
+                Cannot delete {category.name} because it contains{' '}
                 {category._count.products} product(s). Please move or delete the
                 products first before deleting this category.
               </>
             ) : (
               <>
-                Are you sure you want to delete "{category.name}"? This action
+                Are you sure you want to delete {category.name}? This action
                 cannot be undone.
               </>
             )}

@@ -23,7 +23,7 @@ import { cn, formatCurrency } from '~/lib/utils';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/recipes.$id';
 
-export function meta({ params }: Route.MetaArgs) {
+export function meta() {
   return [{ title: `Recipe Details | Kape Natin PH` }];
 }
 

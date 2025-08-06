@@ -45,7 +45,7 @@ export function ProductDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Product</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{product.name}"? This action cannot
+            Are you sure you want to delete {product.name}? This action cannot
             be undone and will remove all associated variants and inventory
             records.
           </AlertDialogDescription>

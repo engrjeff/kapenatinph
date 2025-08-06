@@ -28,6 +28,7 @@ export function ProductTable({
       name: string;
       values: Array<{ value: string }>;
     }>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     variants: Array<any>;
   }>;
 }) {

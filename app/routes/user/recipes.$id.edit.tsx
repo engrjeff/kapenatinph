@@ -9,7 +9,7 @@ import { recipeService } from '~/features/recipe/service';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/recipes.$id.edit';
 
-export function meta({ params }: Route.MetaArgs) {
+export function meta() {
   return [{ title: `Edit Recipe | Kape Natin PH` }];
 }
 
@@ -45,7 +45,7 @@ export async function loader(args: Route.LoaderArgs) {
       id: item.id,
       name: item.name,
       unit: item.unit,
-      costPrice: item.costPrice,
+      unitPrice: item.unitPrice,
     })),
   });
 }

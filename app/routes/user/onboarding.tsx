@@ -51,8 +51,8 @@ export async function action(args: Route.ActionArgs) {
     const store = await storeService.createStore(storeData, userId);
 
     // create default categories
-    if (store?.id) {
-      const categories = await prisma.category.createMany({
+    if (store?.id && intent === 'create') {
+      await prisma.category.createMany({
         data: DEFAULT_CATEGORIES.map((cat) => ({
           ...cat,
           userId,

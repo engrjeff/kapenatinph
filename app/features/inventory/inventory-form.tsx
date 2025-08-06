@@ -217,7 +217,7 @@ export function InventoryForm({
               name="measurementPerUnit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Measurement per Price</FormLabel>
+                  <FormLabel>Measurement per Unit</FormLabel>
                   <FormControl>
                     <NumberInput min={0} placeholder="0" {...field} />
                   </FormControl>

@@ -9,7 +9,7 @@ import { productService } from '~/features/product/service';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/products.$id.edit';
 
-export function meta({ params, data }: Route.MetaArgs) {
+export function meta({ data }: Route.MetaArgs) {
   return [
     {
       title: data?.product

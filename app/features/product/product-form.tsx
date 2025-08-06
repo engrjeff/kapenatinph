@@ -38,6 +38,7 @@ import {
 } from './schema';
 
 export interface ProductFormProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialValue?: any;
   categories: ProductCategory[];
   isEditing?: boolean;
@@ -136,6 +137,7 @@ export function ProductForm({
     });
 
     return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasVariants, form.watch, replaceVariants]);
 
   const generateCombinations = (options: VariantOptionInputs[]) => {

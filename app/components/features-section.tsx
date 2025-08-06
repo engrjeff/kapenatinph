@@ -1,44 +1,56 @@
-import { 
-  PackageIcon, 
-  ShoppingBagIcon, 
-  TrendingUpIcon, 
+import {
   BarChart3Icon,
   ClockIcon,
-  ShieldCheckIcon
+  PackageIcon,
+  ShieldCheckIcon,
+  ShoppingBagIcon,
+  TrendingUpIcon,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 
 const FEATURES = [
   {
     icon: PackageIcon,
     title: 'Inventory Management',
-    description: 'Track your coffee beans, supplies, and ingredients with real-time inventory updates.'
+    description:
+      'Track your coffee beans, supplies, and ingredients with real-time inventory updates.',
   },
   {
     icon: ShoppingBagIcon,
     title: 'Product Catalog',
-    description: 'Manage your coffee menu, prices, and product variations all in one place.'
+    description:
+      'Manage your coffee menu, prices, and product variations all in one place.',
   },
   {
     icon: TrendingUpIcon,
     title: 'Sales Tracking',
-    description: 'Monitor daily sales, revenue, and popular items to grow your business.'
+    description:
+      'Monitor daily sales, revenue, and popular items to grow your business.',
   },
   {
     icon: BarChart3Icon,
     title: 'Analytics Dashboard',
-    description: 'Get insights into your business performance with detailed reports and charts.'
+    description:
+      'Get insights into your business performance with detailed reports and charts.',
   },
   {
     icon: ClockIcon,
     title: 'Quick Setup',
-    description: 'Get started in minutes with our simple onboarding process and intuitive interface.'
+    description:
+      'Get started in minutes with our simple onboarding process and intuitive interface.',
   },
   {
     icon: ShieldCheckIcon,
     title: 'Secure & Reliable',
-    description: 'Your data is protected with enterprise-grade security and reliable cloud hosting.'
-  }
+    description:
+      'Your data is protected with enterprise-grade security and reliable cloud hosting.',
+  },
 ];
 
 export function FeaturesSection() {
@@ -50,11 +62,11 @@ export function FeaturesSection() {
             Everything you need to run your coffee shop
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From inventory management to sales tracking, we've got all the tools 
-            to help your coffee business thrive.
+            From inventory management to sales tracking, we&apos;ve got all the
+            tools to help your coffee business thrive.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {FEATURES.map((feature, index) => {
             const Icon = feature.icon;

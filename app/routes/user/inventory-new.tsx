@@ -7,7 +7,7 @@ import prisma from '~/lib/prisma';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/inventory-new';
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [{ title: 'New Inventory | Kape Natin PH' }];
 }
 

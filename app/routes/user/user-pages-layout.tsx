@@ -1,4 +1,3 @@
-import { useUser } from '@clerk/clerk-react';
 import { NavLink, Outlet, useLoaderData, useLocation } from 'react-router';
 import { AppFooter } from '~/components/app-footer';
 import { AppHeader } from '~/components/app-header';
@@ -31,58 +30,44 @@ export function useUserPageLayoutLoaderData() {
 function UserPagesLayout({ loaderData }: Route.ComponentProps) {
   const { pathname } = useLocation();
 
-  const { user, isLoaded } = useUser();
-
   const isOnboarding = pathname === '/onboarding';
 
   return (
-    <>
-      {/* <AppHeader />
-      {!isOnboarding && <Sidebar />}
-      <main
-        className={`pt-20 pb-6 px-6 min-h-screen ${!isOnboarding ? 'ml-64' : ''}`}
-      >
-        <div className="max-w-full mx-auto space-y-6">
-          <Outlet />
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': 'calc(var(--spacing) * 72)',
+          '--header-height': 'calc(var(--spacing) * 12)',
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <AppHeader />
+        <div className="p-6 space-y-6 flex-1">
+          {!isOnboarding && !loaderData.store ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>You haven&apos;t set up your shop yet</CardTitle>
+                <CardDescription>
+                  Click the button below to set up your shop.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button type="button" asChild>
+                  <NavLink to="/onboarding">
+                    <span>Set up my Coffee Shop</span>
+                  </NavLink>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Outlet />
+          )}
         </div>
-      </main>
-      <AppFooter /> */}
-      <SidebarProvider
-        style={
-          {
-            '--sidebar-width': 'calc(var(--spacing) * 72)',
-            '--header-height': 'calc(var(--spacing) * 12)',
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar variant="inset" />
-        <SidebarInset>
-          <AppHeader />
-          <div className="p-6 space-y-6 flex-1">
-            {!isOnboarding && !loaderData.store ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>You haven&apos;t set up your shop yet</CardTitle>
-                  <CardDescription>
-                    Click the button below to set up your shop.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button type="button" asChild>
-                    <NavLink to="/onboarding">
-                      <span>Set up my Coffee Shop</span>
-                    </NavLink>
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <Outlet />
-            )}
-          </div>
-          <AppFooter />
-        </SidebarInset>
-      </SidebarProvider>
-    </>
+        <AppFooter />
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 

@@ -17,19 +17,20 @@ export function handleActionError(error: unknown): ErrorResponse {
   console.log('Prisma Error: ', error);
   // Handle known Prisma errors
   if (error instanceof PrismaClientKnownRequestError) {
+    const model = error?.meta?.modelName
+      ? (error?.meta?.modelName as string).toLowerCase()
+      : '';
+
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+
+    const article = vowels.includes(model.charAt(0)) ? 'An' : 'A';
+
+    const field = error.meta?.target as string[] | undefined;
+
+    let fieldName = field?.[0];
+
     switch (error.code) {
-      case 'P2002':
-        // Unique constraint violation
-        const model = (error?.meta?.modelName as string)?.toLowerCase() ?? '';
-
-        const vowels = ['a', 'e', 'i', 'o', 'u'];
-
-        const article = vowels.includes(model.charAt(0)) ? 'An' : 'A';
-
-        const field = error.meta?.target as string[] | undefined;
-
-        let fieldName = field?.[0];
-
+      case 'P2002': // Unique constraint violation
         if (fieldName === 'userId') {
           if (field?.[1]) {
             fieldName = field?.[1];
