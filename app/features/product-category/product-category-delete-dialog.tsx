@@ -1,4 +1,4 @@
-import { useFetcher } from 'react-router';
+import { type ComponentProps } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,13 +8,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '~/components/ui/alert-dialog';
 import type { ProductCategory } from '~/generated/prisma/client';
-import { useState } from 'react';
+import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 
-interface ProductCategoryDeleteDialogProps {
-  trigger: React.ReactNode;
+interface ProductCategoryDeleteDialogProps
+  extends ComponentProps<typeof AlertDialog> {
   category: ProductCategory & {
     _count: {
       products: number;
@@ -22,42 +21,46 @@ interface ProductCategoryDeleteDialogProps {
   };
 }
 
-export function ProductCategoryDeleteDialog({ 
-  trigger, 
-  category 
+export function ProductCategoryDeleteDialog({
+  category,
+  ...dialogProps
 }: ProductCategoryDeleteDialogProps) {
-  const [open, setOpen] = useState(false);
-  const fetcher = useFetcher();
+  const fetcher = useFetcherWithResponseHandler({
+    redirectTo: '/product-categories',
+  });
   const isLoading = fetcher.state !== 'idle';
 
   const handleDelete = () => {
-    const formData = new FormData();
-    formData.append('intent', 'delete');
-    formData.append('id', category.id);
-    
-    fetcher.submit(formData, { method: 'POST', action: '/product-categories' });
-    setOpen(false);
+    fetcher.submit(
+      { id: category.id, intent: 'delete' },
+      {
+        method: 'POST',
+        action: '/product-categories',
+        encType: 'application/json',
+      }
+    );
+
+    dialogProps.onOpenChange?.(false);
   };
 
   const hasProducts = category._count.products > 0;
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        {trigger}
-      </AlertDialogTrigger>
+    <AlertDialog {...dialogProps}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Category</AlertDialogTitle>
           <AlertDialogDescription>
             {hasProducts ? (
               <>
-                Cannot delete "{category.name}" because it contains {category._count.products} product(s). 
-                Please move or delete the products first before deleting this category.
+                Cannot delete "{category.name}" because it contains{' '}
+                {category._count.products} product(s). Please move or delete the
+                products first before deleting this category.
               </>
             ) : (
               <>
-                Are you sure you want to delete "{category.name}"? This action cannot be undone.
+                Are you sure you want to delete "{category.name}"? This action
+                cannot be undone.
               </>
             )}
           </AlertDialogDescription>
