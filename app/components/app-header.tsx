@@ -6,8 +6,8 @@ export function AppHeader() {
   const { user, isLoaded } = useUser();
 
   return (
-    <header className="border-b">
-      <div className="p-4 h-14 flex items-center justify-between container mx-auto">
+    <header className="fixed top-0 left-0 right-0 bg-background border-b z-50">
+      <div className="px-6 h-14 flex items-center justify-between">
         <Link to="/" className="font-semibold">
           Kape Natin PH
         </Link>

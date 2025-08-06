@@ -1,4 +1,5 @@
-import { useUser } from '@clerk/clerk-react';
+import { FeaturesSection } from '~/components/features-section';
+import { HeroSection } from '~/components/hero-section';
 import type { Route } from './+types/home';
 
 export function meta({}: Route.MetaArgs) {
@@ -8,12 +9,11 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: 'Hello from Vercel' };
-}
-
-export default function Home({ loaderData }: Route.ComponentProps) {
-  const { isSignedIn, user, isLoaded } = useUser();
-
-  return <h1>Hello, {user?.fullName}</h1>;
+export default function Home() {
+  return (
+    <>
+      <HeroSection />
+      <FeaturesSection />
+    </>
+  );
 }

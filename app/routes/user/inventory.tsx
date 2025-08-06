@@ -231,7 +231,7 @@ export default function InventoryPage({ loaderData }: Route.ComponentProps) {
         lowInStockCount={lowInStockCount}
         outOfStockCount={outOfStockCount}
       />
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <SearchField />
         <InventoryStatusFilter />
       </div>

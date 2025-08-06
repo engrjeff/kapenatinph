@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useLoaderData, useLocation } from 'react-router';
 import { AppFooter } from '~/components/app-footer';
 import { AppHeader } from '~/components/app-header';
-import { AppLinks } from '~/components/app-links';
+import { Sidebar } from '~/components/sidebar';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -35,7 +35,7 @@ function UserPagesLayout({ loaderData }: Route.ComponentProps) {
     return (
       <>
         <AppHeader />
-        <main className="container mx-auto max-w-5xl min-h-[90vh] p-4 space-y-4">
+        <main className="container mx-auto max-w-5xl min-h-[calc(100vh-3.5rem)] pt-20 p-4 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>You haven&apos;t set up your shop yet</CardTitle>
@@ -59,9 +59,13 @@ function UserPagesLayout({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <AppHeader />
-      <main className="container mx-auto max-w-5xl min-h-[90vh] p-4 space-y-4">
-        {isOnboarding ? null : <AppLinks />}
-        <Outlet />
+      {!isOnboarding && <Sidebar />}
+      <main
+        className={`pt-20 pb-6 px-6 h-screen overflow-y-auto ${!isOnboarding ? 'ml-64' : ''}`}
+      >
+        <div className="max-w-full mx-auto space-y-6">
+          <Outlet />
+        </div>
       </main>
       <AppFooter />
     </>
