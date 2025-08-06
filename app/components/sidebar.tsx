@@ -1,4 +1,5 @@
 import {
+  ChefHatIcon,
   HomeIcon,
   PackageIcon,
   SettingsIcon,
@@ -24,6 +25,11 @@ const NAVIGATION_ITEMS = [
     path: '/products',
     label: 'Products',
     icon: ShoppingBagIcon,
+  },
+  {
+    path: '/recipes',
+    label: 'Recipes',
+    icon: ChefHatIcon,
   },
   {
     path: '/sales',

@@ -90,6 +90,9 @@ model Product {
   variantOptions ProductVariantOption[]
   variants       ProductVariant[]
 
+  // Recipe relation
+  recipes Recipe[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -148,6 +151,9 @@ model ProductVariant {
   // Combination of option values
   optionValues ProductVariantValue[]
 
+  // Recipe relation
+  recipes Recipe[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -186,6 +192,9 @@ model Inventory {
   supplier     String?
   status       InventoryStatus @default(IN_STOCK)
 
+  // Recipe ingredients relation
+  recipeIngredients RecipeIngredient[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -195,4 +204,62 @@ model Inventory {
   @@index([userId])
   @@index([status])
   @@index([categoryId])
+}
+
+model Recipe {
+  id     String @id @default(cuid())
+  userId String // clerk user id
+
+  name        String
+  description String?
+
+  // Recipe can be linked to either a product or a specific variant
+  productId        String
+  product          Product         @relation(references: [id], fields: [productId], onDelete: Cascade)
+  productVariantId String?
+  productVariant   ProductVariant? @relation(references: [id], fields: [productVariantId], onDelete: Cascade)
+
+  // Recipe details
+  instructions    String? // Optional cooking/preparation instructions
+  prepTimeMinutes Int? // Preparation time in minutes
+
+  // Calculated cost based on ingredient prices and quantities
+  totalCost Float @default(0) // Pro-rated cost of all ingredients
+
+  // Recipe ingredients
+  ingredients RecipeIngredient[]
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([productId])
+  @@index([productVariantId])
+  @@index([isActive])
+}
+
+model RecipeIngredient {
+  id       String @id @default(cuid())
+  recipeId String
+  recipe   Recipe @relation(references: [id], fields: [recipeId], onDelete: Cascade)
+
+  inventoryId String
+  inventory   Inventory @relation(references: [id], fields: [inventoryId], onDelete: Cascade)
+
+  // Quantity required for this recipe
+  quantity Float // e.g., 10.5
+  unit     String // e.g., "g", "ml", "pieces", "cups"
+
+  // Optional notes for this ingredient in the recipe
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([recipeId, inventoryId]) // A recipe can't have duplicate ingredients
+  @@index([recipeId])
+  @@index([inventoryId])
 }

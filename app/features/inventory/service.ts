@@ -1,4 +1,3 @@
-import pluralize from 'pluralize';
 import { InventoryStatus } from '~/generated/prisma/enums';
 import type { InventoryCreateArgs } from '~/generated/prisma/models';
 import { PAGINATION } from '~/lib/constants';
@@ -52,7 +51,7 @@ export async function getInventoryItems({
     },
     data: inventoryItems.map((i) => ({
       ...i,
-      unit: pluralize(i.unit, i.quantity),
+      // unit: pluralize(i.unit, i.quantity),
     })),
   };
 }

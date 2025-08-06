@@ -26,6 +26,11 @@ export default [
 
     route('product-categories', 'routes/user/product-categories.tsx'),
 
+    route('recipes', 'routes/user/recipes.tsx'),
+    route('recipes/new', 'routes/user/recipes.new.tsx'),
+    route('recipes/:id', 'routes/user/recipes.$id.tsx'),
+    route('recipes/:id/edit', 'routes/user/recipes.$id.edit.tsx'),
+
     route('sales', 'routes/user/sales.tsx'),
   ]),
 ] satisfies RouteConfig;
