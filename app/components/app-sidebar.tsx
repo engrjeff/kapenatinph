@@ -1,4 +1,5 @@
 import {
+  IconCategory,
   IconChefHat,
   IconCoffee,
   IconHelp,
@@ -38,6 +39,11 @@ const data = {
       url: '/products',
       title: 'Products',
       icon: IconShoppingBag,
+    },
+    {
+      url: '/product-categories',
+      title: 'Categories',
+      icon: IconCategory,
     },
     {
       url: '/recipes',

@@ -1,6 +1,6 @@
 import {
   ChefHatIcon,
-  ChevronDownIcon,
+  ChevronRightIcon,
   PackageIcon,
   PlusCircleIcon,
   ShoppingBagIcon,
@@ -23,10 +23,14 @@ export function QuickCreateDropdown() {
         <Button className="w-full justify-start">
           <PlusCircleIcon />
           Quick Create
-          <ChevronDownIcon className="ml-auto" />
+          <ChevronRightIcon className="ml-auto" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
+      <DropdownMenuContent
+        className="w-(--radix-dropdown-menu-trigger-width)"
+        align="start"
+        side="right"
+      >
         <DropdownMenuLabel>Create new ...</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
