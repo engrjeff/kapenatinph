@@ -19,7 +19,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   const [recipe, products, inventoryData] = await Promise.all([
     recipeService.getRecipeById(id, userId),
-    productService.getAllProducts(userId),
+    productService.getAllProducts({ userId }),
     getInventoryItems({
       userId,
       limit: 1000, // Get all inventory items for the form
@@ -32,7 +32,7 @@ export async function loader(args: Route.LoaderArgs) {
 
   return data({
     recipe,
-    products: products.map((p) => ({
+    products: products.data?.map((p) => ({
       id: p.id,
       name: p.name,
       hasVariants: p.hasVariants,
