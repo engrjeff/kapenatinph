@@ -32,8 +32,9 @@ import type { ProductCategory } from '~/generated/prisma/client';
 import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
 import { generateSku } from '~/lib/utils';
 import {
-  productSchema,
+  updateProductSchema,
   type ProductInputs,
+  type UpdateProductInputs,
   type VariantOptionInputs,
 } from './schema';
 import type { ProductData } from './service';
@@ -47,34 +48,39 @@ export function ProductEditForm({
   product: initialValue,
   categories,
 }: ProductEditFormProps) {
+  // console.log(initialValue);
+
   const [hasVariants, setHasVariants] = useState(
     initialValue?.hasVariants ?? false
   );
 
-  const form = useForm<ProductInputs>({
-    resolver: zodResolver(productSchema),
+  const form = useForm<UpdateProductInputs>({
+    mode: 'onChange',
+    resolver: zodResolver(updateProductSchema),
     defaultValues: {
-      name: initialValue?.name ?? '',
-      description: initialValue?.description ?? '',
-      categoryId: initialValue?.categoryId ?? '',
-      sku: initialValue?.sku ?? '',
-      basePrice: initialValue?.basePrice ?? undefined,
-      isActive: initialValue?.isActive ?? true,
-      hasVariants: initialValue?.hasVariants ?? false,
-      variantOptions: initialValue?.variantOptions ?? [],
+      intent: 'update',
+      id: initialValue.id,
+      name: initialValue.name ?? '',
+      description: initialValue.description ?? '',
+      categoryId: initialValue.categoryId ?? '',
+      sku: initialValue.sku ?? '',
+      basePrice: initialValue.basePrice ?? undefined,
+      isActive: initialValue.isActive ?? true,
+      hasVariants: initialValue.hasVariants ?? false,
+      variantOptions: initialValue.variantOptions ?? [],
       variants:
-        initialValue?.variants?.map((v) => ({
+        initialValue.variants?.map((v) => ({
+          id: v?.id,
           isAvailable: v.isAvailable,
           isDefault: v.isDefault,
           price: v.price,
           title: v.title,
           sku: v.sku,
-          optionValues: v.optionValues.map((o) => o.id),
         })) ?? [],
     },
   });
 
-  console.log(form.watch());
+  const formErrors = form.formState.errors;
 
   const {
     fields: optionFields,
@@ -90,14 +96,12 @@ export function ProductEditForm({
     name: 'variants',
   });
 
-  const fetcher = useFetcherWithResponseHandler<ProductInputs>({
+  const fetcher = useFetcherWithResponseHandler<UpdateProductInputs>({
     redirectTo: '/products',
     form,
   });
 
   const isLoading = fetcher.state !== 'idle';
-
-  const nameAndSku = form.watch(['name', 'sku'])?.join('-');
 
   // Generate variant combinations when options change
   useEffect(() => {
@@ -107,10 +111,20 @@ export function ProductEditForm({
       // Only regenerate when variant options change or product name changes
       if (name?.startsWith('variantOptions') || name === 'name') {
         const options = values.variantOptions || [];
+
         if (options.length === 0) {
           replaceVariants([]);
           return;
         }
+
+        const currentVariantsMap = values.variants
+          ? new Map<string, { price: number; id: string }>(
+              values.variants.map((v) => [
+                v?.title as string,
+                { price: v?.price as number, id: v?.id as string },
+              ])
+            )
+          : undefined;
 
         // Check if all options have valid values
         const validOptions = options.filter(
@@ -130,22 +144,26 @@ export function ProductEditForm({
           validOptions as VariantOptionInputs[]
         );
         const productName = values.name || '';
-        const basePrice = values.basePrice;
-        const newVariants = combinations.map((combo) => ({
-          title: combo.title,
-          sku: generateSku(`${productName}-${combo.title}`),
-          price: basePrice ?? 0,
-          isDefault: false,
-          isAvailable: true,
-          optionValues: [],
-        }));
+
+        const newVariants = combinations.map((combo) => {
+          const found = currentVariantsMap?.get(combo.title);
+
+          return {
+            title: combo.title,
+            id: found?.id,
+            price: found?.price ?? 0,
+            sku: generateSku(`${productName}-${combo.title}`),
+            isDefault: false,
+            isAvailable: true,
+          };
+        });
 
         replaceVariants(newVariants);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [hasVariants, form, replaceVariants, nameAndSku]);
+  }, [hasVariants, form, replaceVariants]);
 
   const generateCombinations = (options: VariantOptionInputs[]) => {
     if (options.length === 0) return [];
@@ -193,6 +211,9 @@ export function ProductEditForm({
       intent: 'update',
       id: initialValue.id,
     };
+
+    // console.log(submitData);
+    // return;
 
     // Submit JSON data instead of FormData to preserve types
     fetcher.submit(submitData, {
@@ -406,7 +427,6 @@ export function ProductEditForm({
                       price: basePrice,
                       isDefault: false,
                       isAvailable: true,
-                      optionValues: [],
                     }));
                     replaceVariants(newVariants);
                   }
@@ -508,6 +528,15 @@ export function ProductEditForm({
                               </Button>
                             </div>
                           ))}
+                        {formErrors.variantOptions?.[optionIndex]?.values?.root
+                          ?.message ? (
+                          <p className="text-destructive text-sm">
+                            {
+                              formErrors.variantOptions?.[optionIndex]?.values
+                                ?.root?.message
+                            }
+                          </p>
+                        ) : null}
                         <Button
                           type="button"
                           variant="ghost"

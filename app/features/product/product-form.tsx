@@ -54,6 +54,7 @@ export function ProductForm({
   const isDuplicating = Boolean(initialValue);
 
   const form = useForm<ProductInputs>({
+    mode: 'onChange',
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: isDuplicating ? '' : (initialValue?.name ?? ''),
@@ -71,10 +72,11 @@ export function ProductForm({
           price: v.price,
           title: v.title,
           sku: isDuplicating ? '' : v.sku,
-          optionValues: v.optionValues.map((o) => o.id),
         })) ?? [],
     },
   });
+
+  const formErrors = form.formState.errors;
 
   const {
     fields: optionFields,
@@ -155,7 +157,6 @@ export function ProductForm({
           price: currentVariantsPriceMap?.get(combo.title) ?? 0,
           isDefault: false,
           isAvailable: true,
-          optionValues: [],
         }));
 
         replaceVariants(newVariants);
@@ -423,7 +424,6 @@ export function ProductForm({
                       price: 0,
                       isDefault: false,
                       isAvailable: true,
-                      optionValues: [],
                     }));
                     replaceVariants(newVariants);
                   }
@@ -525,6 +525,15 @@ export function ProductForm({
                               </Button>
                             </div>
                           ))}
+                        {formErrors.variantOptions?.[optionIndex]?.values?.root
+                          ?.message ? (
+                          <p className="text-destructive text-sm">
+                            {
+                              formErrors.variantOptions?.[optionIndex]?.values
+                                ?.root?.message
+                            }
+                          </p>
+                        ) : null}
                         <Button
                           type="button"
                           variant="ghost"

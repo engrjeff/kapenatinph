@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 // Variant option value schema (e.g., "8oz", "Hot")
 export const variantOptionValueSchema = z.object({
+  id: z.string().optional(), // optional id, for edit
   value: z
     .string({ error: 'Option value is required' })
     .min(1, { message: 'Option value is required' }),
@@ -10,13 +11,14 @@ export const variantOptionValueSchema = z.object({
 
 // Variant option schema (e.g., "Size", "Temperature")
 export const variantOptionSchema = z.object({
+  id: z.string().optional(), // optional id, for edit
   name: z
     .string({ error: 'Option name is required' })
     .min(1, { message: 'Option name is required' }),
   position: z.number(),
   values: z
     .array(variantOptionValueSchema)
-    .min(1, { message: 'At least one option value is required' })
+    .min(2, { message: 'At least 2 option values are required' })
     .superRefine((items, ctx) => {
       const uniqueItemsCount = new Set(
         items.map((item) => item.value.toLowerCase())
@@ -37,6 +39,7 @@ export const variantOptionSchema = z.object({
 
 // Individual variant schema (e.g., "8oz / Hot")
 export const productVariantSchema = z.object({
+  id: z.string().optional(), // optional id, for edit
   title: z
     .string({ error: 'Variant title is required' })
     .min(1, { message: 'Variant title is required' }),
@@ -49,7 +52,6 @@ export const productVariantSchema = z.object({
     .nonnegative({ message: 'Price cannot be negative' }),
   isDefault: z.boolean(),
   isAvailable: z.boolean(),
-  optionValues: z.array(z.string()), // Array of option value IDs
 });
 
 export const productSchema = z.object({
@@ -109,3 +111,4 @@ export type VariantOptionValueInputs = z.infer<typeof variantOptionValueSchema>;
 export type VariantOptionInputs = z.infer<typeof variantOptionSchema>;
 export type ProductVariantInputs = z.infer<typeof productVariantSchema>;
 export type ProductInputs = z.infer<typeof productSchema>;
+export type UpdateProductInputs = z.infer<typeof updateProductSchema>;

@@ -130,8 +130,6 @@ model ProductVariantOptionValue {
   value    String // e.g., "8oz", "12oz", "Hot", "Cold"
   position Int    @default(0)
 
-  variantValues ProductVariantValue[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -150,9 +148,6 @@ model ProductVariant {
   isDefault   Boolean @default(false)
   isAvailable Boolean @default(true)
 
-  // Combination of option values
-  optionValues ProductVariantValue[]
-
   // Recipe relation
   recipes Recipe[]
 
@@ -163,18 +158,6 @@ model ProductVariant {
   @@unique([sku])
   @@index([productId])
   @@index([sku])
-}
-
-model ProductVariantValue {
-  id            String                    @id @default(cuid())
-  variantId     String
-  variant       ProductVariant            @relation(references: [id], fields: [variantId], onDelete: Cascade)
-  optionValueId String
-  optionValue   ProductVariantOptionValue @relation(references: [id], fields: [optionValueId], onDelete: Cascade)
-
-  @@unique([variantId, optionValueId])
-  @@index([variantId])
-  @@index([optionValueId])
 }
 
 model Inventory {
