@@ -4,7 +4,7 @@ import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 import { productCategoryService } from '~/features/product-category/service';
 import { ProductDeleteDialog } from '~/features/product/product-delete-dialog';
-import { ProductForm } from '~/features/product/product-form';
+import { ProductEditForm } from '~/features/product/product-edit-form';
 import { productService } from '~/features/product/service';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/products.$id.edit';
@@ -57,11 +57,7 @@ function EditProductPage({ loaderData }: Route.ComponentProps) {
         </p>
       </div>
       <Separator />
-      <ProductForm
-        initialValue={product}
-        categories={categories}
-        isEditing={true}
-      />
+      <ProductEditForm product={product} categories={categories} />
       <Separator />
       <div className="flex justify-between items-center">
         <div>

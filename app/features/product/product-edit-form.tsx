@@ -38,28 +38,26 @@ import {
 } from './schema';
 import type { ProductData } from './service';
 
-export interface ProductFormProps {
-  itemToDuplicate?: ProductData;
+export interface ProductEditFormProps {
+  product: ProductData;
   categories: ProductCategory[];
 }
 
-export function ProductForm({
-  itemToDuplicate: initialValue,
+export function ProductEditForm({
+  product: initialValue,
   categories,
-}: ProductFormProps) {
+}: ProductEditFormProps) {
   const [hasVariants, setHasVariants] = useState(
     initialValue?.hasVariants ?? false
   );
 
-  const isDuplicating = Boolean(initialValue);
-
   const form = useForm<ProductInputs>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: isDuplicating ? '' : (initialValue?.name ?? ''),
+      name: initialValue?.name ?? '',
       description: initialValue?.description ?? '',
       categoryId: initialValue?.categoryId ?? '',
-      sku: isDuplicating ? '' : (initialValue?.sku ?? ''),
+      sku: initialValue?.sku ?? '',
       basePrice: initialValue?.basePrice ?? undefined,
       isActive: initialValue?.isActive ?? true,
       hasVariants: initialValue?.hasVariants ?? false,
@@ -70,11 +68,13 @@ export function ProductForm({
           isDefault: v.isDefault,
           price: v.price,
           title: v.title,
-          sku: isDuplicating ? '' : v.sku,
+          sku: v.sku,
           optionValues: v.optionValues.map((o) => o.id),
         })) ?? [],
     },
   });
+
+  console.log(form.watch());
 
   const {
     fields: optionFields,
@@ -97,16 +97,12 @@ export function ProductForm({
 
   const isLoading = fetcher.state !== 'idle';
 
+  const nameAndSku = form.watch(['name', 'sku'])?.join('-');
+
   // Generate variant combinations when options change
   useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (!hasVariants) return;
-
-      if (name === 'name' && values.name) {
-        // update the SKU
-        const sku = generateSku(values.name);
-        form.setValue('sku', sku);
-      }
 
       // Only regenerate when variant options change or product name changes
       if (name?.startsWith('variantOptions') || name === 'name') {
@@ -129,30 +125,16 @@ export function ProductForm({
           return;
         }
 
-        const currentVariantsPriceMap = values.variants
-          ? new Map<string, number>()
-          : undefined;
-
-        if (currentVariantsPriceMap) {
-          values.variants?.forEach((variant) => {
-            if (currentVariantsPriceMap.has(variant?.title as string)) return;
-
-            currentVariantsPriceMap.set(
-              variant?.title as string,
-              variant?.price as number
-            );
-          });
-        }
-
         // Generate all combinations
         const combinations = generateCombinations(
           validOptions as VariantOptionInputs[]
         );
         const productName = values.name || '';
+        const basePrice = values.basePrice;
         const newVariants = combinations.map((combo) => ({
           title: combo.title,
           sku: generateSku(`${productName}-${combo.title}`),
-          price: currentVariantsPriceMap?.get(combo.title) ?? 0,
+          price: basePrice ?? 0,
           isDefault: false,
           isAvailable: true,
           optionValues: [],
@@ -163,7 +145,7 @@ export function ProductForm({
     });
 
     return () => subscription.unsubscribe();
-  }, [hasVariants, form, replaceVariants, isDuplicating]);
+  }, [hasVariants, form, replaceVariants, nameAndSku]);
 
   const generateCombinations = (options: VariantOptionInputs[]) => {
     if (options.length === 0) return [];
@@ -208,7 +190,8 @@ export function ProductForm({
       hasVariants,
       variantOptions: hasVariants ? data.variantOptions : [],
       variants: hasVariants ? data.variants : [],
-      intent: 'create',
+      intent: 'update',
+      id: initialValue.id,
     };
 
     // Submit JSON data instead of FormData to preserve types
@@ -416,11 +399,11 @@ export function ProductForm({
                       defaultSizeOption,
                     ]);
                     const productName = form.watch('name') || '';
-
+                    const basePrice = form.watch('basePrice');
                     const newVariants = combinations.map((combo) => ({
                       title: combo.title,
                       sku: generateSku(`${productName}-${combo.title}`),
-                      price: 0,
+                      price: basePrice,
                       isDefault: false,
                       isAvailable: true,
                       optionValues: [],
@@ -687,7 +670,7 @@ export function ProductForm({
             >
               Reset
             </Button>
-            <SubmitButton loading={isLoading}>Create Product</SubmitButton>
+            <SubmitButton loading={isLoading}>Update Product</SubmitButton>
           </div>
         </fieldset>
       </form>

@@ -72,11 +72,6 @@ export function ProductTable({
                 <TableCell>
                   <div>
                     <div className="font-medium">{product.name}</div>
-                    {product.description && (
-                      <div className="text-sm text-muted-foreground">
-                        {product.description}
-                      </div>
-                    )}
                     {product.sku && (
                       <div className="text-xs text-muted-foreground">
                         SKU: {product.sku}

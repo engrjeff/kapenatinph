@@ -51,9 +51,10 @@ export const recipeService = {
             inventory: {
               select: {
                 name: true,
-                unit: true,
                 unitPrice: true,
-                measurementPerUnit: true,
+                orderUnit: true,
+                amountPerUnit: true,
+                unit: true,
               },
             },
           },
@@ -107,9 +108,10 @@ export const recipeService = {
               select: {
                 id: true,
                 name: true,
-                unit: true,
                 unitPrice: true,
-                measurementPerUnit: true,
+                orderUnit: true,
+                amountPerUnit: true,
+                unit: true,
               },
             },
           },
@@ -139,7 +141,12 @@ export const recipeService = {
         // Get inventory item to calculate cost
         const inventoryItem = await tx.inventory.findUnique({
           where: { id: ingredient.inventoryId },
-          select: { unitPrice: true, measurementPerUnit: true, unit: true },
+          select: {
+            unitPrice: true,
+            orderUnit: true,
+            amountPerUnit: true,
+            unit: true,
+          },
         });
 
         if (!inventoryItem) {
@@ -161,7 +168,7 @@ export const recipeService = {
         // Calculate pro-rated cost for this ingredient
         // Assuming the inventory costPrice is per unit and we need to calculate based on quantity
         const ingredientCost =
-          (inventoryItem.unitPrice / inventoryItem.measurementPerUnit) *
+          (inventoryItem.unitPrice / inventoryItem.amountPerUnit) *
           ingredient.quantity; // Simple calculation
         totalCost += ingredientCost;
       }
@@ -187,9 +194,10 @@ export const recipeService = {
               inventory: {
                 select: {
                   name: true,
-                  unit: true,
                   unitPrice: true,
-                  measurementPerUnit: true,
+                  orderUnit: true,
+                  unit: true,
+                  amountPerUnit: true,
                 },
               },
             },
@@ -223,7 +231,12 @@ export const recipeService = {
         // Get inventory item to calculate cost
         const inventoryItem = await tx.inventory.findUnique({
           where: { id: ingredient.inventoryId },
-          select: { unitPrice: true, measurementPerUnit: true, unit: true },
+          select: {
+            unitPrice: true,
+            orderUnit: true,
+            amountPerUnit: true,
+            unit: true,
+          },
         });
 
         if (!inventoryItem) {
@@ -244,7 +257,7 @@ export const recipeService = {
 
         // Calculate pro-rated cost for this ingredient
         const ingredientCost =
-          (inventoryItem.unitPrice / inventoryItem.measurementPerUnit) *
+          (inventoryItem.unitPrice / inventoryItem.amountPerUnit) *
           ingredient.quantity;
         totalCost += ingredientCost;
       }
@@ -270,9 +283,10 @@ export const recipeService = {
               inventory: {
                 select: {
                   name: true,
-                  unit: true,
                   unitPrice: true,
-                  measurementPerUnit: true,
+                  orderUnit: true,
+                  amountPerUnit: true,
+                  unit: true,
                 },
               },
             },

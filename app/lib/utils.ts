@@ -26,7 +26,7 @@ export function generateSku(fromStr: string, ...others: string[]) {
     .replaceAll('-', ' ')
     .split(' ')
     .filter(Boolean)
-    .map((s) => s.slice(0, 3).toUpperCase())
-    .concat(...others.map((o) => o.substring(0, 3).toUpperCase()))
+    .map((s) => s.slice(0, 4).toUpperCase())
+    .concat(...others.map((o) => o.substring(0, 4).toUpperCase()))
     .join('-');
 }

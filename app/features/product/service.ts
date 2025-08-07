@@ -1,10 +1,26 @@
+import { PAGINATION } from '~/lib/constants';
 import prisma from '~/lib/prisma';
+import { getSkip } from '~/lib/utils.server';
 import type { ProductInputs } from './schema';
 
+export interface GetAllProductsArgs {
+  userId: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
 export const productService = {
-  async getAllProducts(userId: string) {
-    return await prisma.product.findMany({
-      where: { userId },
+  async getAllProducts({
+    userId,
+    search,
+    page = PAGINATION.page,
+    limit = PAGINATION.limit,
+  }: GetAllProductsArgs) {
+    const totalDocs = await prisma.product.count({ where: { userId } });
+
+    const products = await prisma.product.findMany({
+      where: { userId, name: { contains: search, mode: 'insensitive' } },
       include: {
         category: true,
         variantOptions: {
@@ -27,8 +43,19 @@ export const productService = {
           },
         },
       },
+      take: limit,
+      skip: getSkip({ limit, page }),
       orderBy: { createdAt: 'desc' },
     });
+
+    return {
+      pageInfo: {
+        total: totalDocs,
+        page,
+        limit,
+      },
+      data: products,
+    };
   },
 
   async getProductById(id: string, userId: string) {
@@ -114,9 +141,6 @@ export const productService = {
               isAvailable: variant.isAvailable,
             },
           });
-
-          // Link variant to option values (this would need to be handled in the UI)
-          // For now, we'll skip the option value linking as it requires more complex logic
         }
       }
 
@@ -277,3 +301,7 @@ export const productService = {
     return combinations;
   },
 };
+
+export type ProductData = NonNullable<
+  Awaited<ReturnType<typeof productService.getProductById>>
+>;

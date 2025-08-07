@@ -197,7 +197,7 @@ export default function RecipeDetailsPage({
                       <TableHead>#</TableHead>
                       <TableHead>Ingredient</TableHead>
                       <TableHead>Quantity</TableHead>
-                      <TableHead>Cost per Unit</TableHead>
+                      <TableHead>Cost</TableHead>
                       <TableHead>Total Cost</TableHead>
                       <TableHead>Notes</TableHead>
                     </TableRow>
@@ -206,7 +206,7 @@ export default function RecipeDetailsPage({
                     {recipe.ingredients.map((ingredient, index) => {
                       const totalCost =
                         (ingredient.inventory.unitPrice /
-                          ingredient.inventory.measurementPerUnit) *
+                          ingredient.inventory.amountPerUnit) *
                         ingredient.quantity;
                       return (
                         <TableRow key={ingredient.id}>
@@ -223,7 +223,10 @@ export default function RecipeDetailsPage({
                             </span>
                           </TableCell>
                           <TableCell className="font-mono">
-                            {formatCurrency(ingredient.inventory.unitPrice)}
+                            {formatCurrency(
+                              ingredient.inventory.unitPrice /
+                                ingredient.inventory.amountPerUnit
+                            )}
                             <span className="text-xs text-muted-foreground">
                               /{ingredient.inventory.unit}
                             </span>

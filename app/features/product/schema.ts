@@ -44,70 +44,52 @@ export const productVariantSchema = z.object({
     .string({ error: 'SKU is required' })
     .min(1, { message: 'SKU is required' }),
   price: z
-    .preprocess(
-      (val) => (val === '' ? undefined : Number(val)),
-      z
-        .number({ error: 'Price must be a number' })
-        .nonnegative({ message: 'Price cannot be negative' })
-    )
-    .optional() as unknown as z.ZodOptional<z.ZodNumber>,
+    .number({ error: 'Price must be a number' })
+    .gt(0, { error: 'Must not be 0' })
+    .nonnegative({ message: 'Price cannot be negative' }),
   isDefault: z.boolean(),
   isAvailable: z.boolean(),
   optionValues: z.array(z.string()), // Array of option value IDs
 });
 
-export const productSchema = z
-  .object({
-    name: z
-      .string({ error: 'Product name is required' })
-      .min(1, { message: 'Product name is required' }),
-    description: z
-      .string()
-      .max(1000, { message: 'Description must be 1000 characters or less' })
-      .optional(),
-    categoryId: z
-      .string({ error: 'Category is required' })
-      .min(1, { message: 'Category is required' }),
-    basePrice: z.preprocess(
-      (val) => (val === '' ? undefined : Number(val)),
-      z
-        .number({ error: 'Base price is required' })
-        .nonnegative({ message: 'Base price cannot be negative' })
-    ) as unknown as z.ZodNumber,
-    sku: z.string().optional(), // SKU for products without variants
-    isActive: z.boolean(),
-    hasVariants: z.boolean(),
-    variantOptions: z.array(variantOptionSchema).superRefine((items, ctx) => {
-      const uniqueItemsCount = new Set(
-        items.map((item) => item.name.toLowerCase())
-      ).size;
-      const errorPosition = items.length - 1;
+export const productSchema = z.object({
+  name: z
+    .string({ error: 'Product name is required' })
+    .min(1, { message: 'Product name is required' }),
+  description: z
+    .string()
+    .max(1000, { message: 'Description must be 1000 characters or less' })
+    .optional(),
+  categoryId: z
+    .string({ error: 'Category is required' })
+    .min(1, { message: 'Category is required' }),
+  basePrice: z
+    .number({ error: 'Base price is required' })
+    .gt(0, { error: 'Must not be 0' })
+    .nonnegative({ message: 'Base price cannot be negative' }),
+  sku: z
+    .string({ error: 'SKU is required' })
+    .min(1, { message: 'SKU is required' }),
+  isActive: z.boolean(),
+  hasVariants: z.boolean(),
+  variantOptions: z.array(variantOptionSchema).superRefine((items, ctx) => {
+    const uniqueItemsCount = new Set(
+      items.map((item) => item.name.toLowerCase())
+    ).size;
+    const errorPosition = items.length - 1;
 
-      const target = items[errorPosition];
+    const target = items[errorPosition];
 
-      if (uniqueItemsCount !== items.length) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `${target.name} already exists.`,
-          path: [errorPosition, 'name'],
-        });
-      }
-    }),
-    variants: z.array(productVariantSchema),
-  })
-  .refine(
-    (data) => {
-      // If no variants, SKU is required
-      if (!data.hasVariants) {
-        return data.sku && data.sku.length > 0;
-      }
-      return true;
-    },
-    {
-      message: 'SKU is required when product has no variants',
-      path: ['sku'],
+    if (uniqueItemsCount !== items.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `${target.name} already exists.`,
+        path: [errorPosition, 'name'],
+      });
     }
-  );
+  }),
+  variants: z.array(productVariantSchema),
+});
 
 export const createProductSchema = productSchema.extend({
   intent: z.literal('create'),

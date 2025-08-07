@@ -24,6 +24,10 @@ export const inventorySchema = z.object({
     .max(200, { message: 'Description must be 200 characters or less' })
     .optional(),
 
+  orderUnit: z
+    .string({ error: 'Order unit is required' })
+    .min(1, { message: 'Order unit is required' }),
+
   unit: z
     .string({ error: 'Unit is required' })
     .min(1, { message: 'Unit is required' }),
@@ -52,11 +56,11 @@ export const inventorySchema = z.object({
       .nonnegative({ message: 'Unit price cannot be negative' })
   ) as unknown as z.ZodNumber,
 
-  measurementPerUnit: z.preprocess(
+  amountPerUnit: z.preprocess(
     (val) => (val === '' ? undefined : Number(val)),
     z
-      .number({ error: 'Measurement per unit is required' })
-      .nonnegative({ message: 'Measurement per unit cannot be negative' })
+      .number({ error: 'Amount per unit is required' })
+      .nonnegative({ message: 'Amount per unit cannot be negative' })
   ) as unknown as z.ZodNumber,
 
   supplier: z

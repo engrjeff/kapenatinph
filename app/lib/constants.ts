@@ -1,13 +1,6 @@
-export const COMMON_UNITS = [
-  'ml',
-  'liter',
-  'g',
-  'kg',
-  'pcs',
-  'pack',
-  'box',
-  'sack',
-];
+export const COMMON_UNITS = ['ml', 'liter', 'g', 'kg', 'pc'];
+
+export const COMMON_ORDER_UNITS = ['pack', 'box', 'sack', 'bottle', 'can'];
 
 export const DEFAULT_CATEGORIES = [
   { name: 'Uncategorized', description: '' },

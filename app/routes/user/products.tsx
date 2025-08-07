@@ -1,7 +1,9 @@
 import { PackageIcon, PlusIcon, SettingsIcon } from 'lucide-react';
 import { data, Link } from 'react-router';
 import z from 'zod';
+import { DataPagination } from '~/components/data-pagination';
 import { PageTitle } from '~/components/page-title';
+import { SearchField } from '~/components/search-field';
 import { Button } from '~/components/ui/button';
 import { ProductTable } from '~/features/product/product-table';
 import {
@@ -22,9 +24,18 @@ export function meta() {
 export async function loader(args: Route.LoaderArgs) {
   const userId = await requireAuth(args);
 
-  const products = await productService.getAllProducts(userId);
+  const url = new URL(args.request.url);
 
-  return { products };
+  const page = Number(url.searchParams.get('page')) || 1;
+  const searchQuery = url.searchParams.get('search') ?? undefined;
+
+  const productsResponse = await productService.getAllProducts({
+    userId,
+    page,
+    search: searchQuery,
+  });
+
+  return productsResponse;
 }
 
 export async function action(args: Route.ActionArgs) {
@@ -150,7 +161,7 @@ export async function action(args: Route.ActionArgs) {
 }
 
 export default function ProductsPage({ loaderData }: Route.ComponentProps) {
-  const { products } = loaderData;
+  const { data: products, pageInfo } = loaderData;
 
   if (products.length === 0) {
     return (
@@ -204,8 +215,11 @@ export default function ProductsPage({ loaderData }: Route.ComponentProps) {
           </Button>
         </div>
       </div>
-
+      <div className="flex items-center gap-4">
+        <SearchField />
+      </div>
       <ProductTable products={products} />
+      <DataPagination pageInfo={pageInfo} />
     </>
   );
 }

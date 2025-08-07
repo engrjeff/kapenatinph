@@ -16,7 +16,7 @@ export async function loader(args: Route.LoaderArgs) {
   const userId = await requireAuth(args);
 
   const [products, inventoryData] = await Promise.all([
-    productService.getAllProducts(userId),
+    productService.getAllProducts({ userId }),
     getInventoryItems({
       userId,
       limit: 1000, // Get all inventory items for the form
@@ -24,7 +24,7 @@ export async function loader(args: Route.LoaderArgs) {
   ]);
 
   return data({
-    products: products.map((p) => ({
+    products: products.data.map((p) => ({
       id: p.id,
       name: p.name,
       hasVariants: p.hasVariants,
@@ -37,7 +37,7 @@ export async function loader(args: Route.LoaderArgs) {
       id: item.id,
       name: item.name,
       unit: item.unit,
-      costPrice: item.costPrice,
+      unitPrice: item.unitPrice,
     })),
   });
 }

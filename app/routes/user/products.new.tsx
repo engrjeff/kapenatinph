@@ -65,8 +65,7 @@ function NewProductPage({ loaderData }: Route.ComponentProps) {
       </div>
       <Separator />
       <ProductForm
-        isDuplicating={isDuplicating}
-        initialValue={loaderData.itemToDuplicate}
+        itemToDuplicate={loaderData.itemToDuplicate ?? undefined}
         categories={loaderData.categories}
       />
     </div>

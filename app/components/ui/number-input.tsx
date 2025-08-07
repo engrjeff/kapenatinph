@@ -8,6 +8,7 @@ export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   currency?: string;
   noDecimal?: boolean;
+  usePeso?: boolean;
 }
 
 export const NumberInput = ({
@@ -15,6 +16,7 @@ export const NumberInput = ({
   type = 'number',
   currency,
   noDecimal,
+  usePeso,
   onChange,
   ...props
 }: InputProps) => {
@@ -30,14 +32,16 @@ export const NumberInput = ({
     onChange(e);
   }
 
-  if (currency)
+  if (currency || usePeso)
     return (
       <div className="relative rounded-md">
         <div className="absolute left-0 top-0 flex h-full min-w-9 items-center justify-center rounded-l p-1 text-center">
-          <span className="text-muted-foreground text-sm">{currency}</span>
+          <span className="text-muted-foreground text-sm">
+            {usePeso ? '₱' : currency}
+          </span>
         </div>
         <Input
-          className={cn('pl-9', className)}
+          className={cn('pl-7', className)}
           type={type}
           inputMode="numeric"
           onWheel={(e) => {
