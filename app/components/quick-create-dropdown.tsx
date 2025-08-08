@@ -20,7 +20,7 @@ export function QuickCreateDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="w-full justify-start">
+        <Button variant="outline" className="w-full justify-start">
           <PlusCircleIcon />
           Quick Create
           <ChevronRightIcon className="ml-auto" />

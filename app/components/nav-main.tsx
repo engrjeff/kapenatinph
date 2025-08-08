@@ -36,7 +36,9 @@ export function NavMain({
                 className={({ isActive, isPending }) =>
                   cn(
                     sidebarMenuButtonVariants(),
-                    isActive ? 'bg-sidebar-accent' : '',
+                    isActive
+                      ? 'bg-primary hover:bg-primary hover:text-primary-foreground'
+                      : '',
                     isPending ? 'opacity-90' : ''
                   )
                 }

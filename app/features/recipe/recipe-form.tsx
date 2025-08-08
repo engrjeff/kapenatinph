@@ -57,6 +57,7 @@ interface RecipeFormProps {
     unitPrice: number;
   }>;
   isEditing?: boolean;
+  isDuplicating?: boolean;
 }
 
 export function RecipeForm({
@@ -64,11 +65,12 @@ export function RecipeForm({
   products = [],
   inventoryItems = [],
   isEditing = false,
+  isDuplicating = false,
 }: RecipeFormProps) {
   const form = useForm<RecipeInputs>({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
-      name: initialValue?.name ?? '',
+      name: isDuplicating ? '' : (initialValue?.name ?? ''),
       description: initialValue?.description ?? '',
       instructions: initialValue?.instructions ?? '',
       prepTimeMinutes: initialValue?.prepTimeMinutes ?? undefined,

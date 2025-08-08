@@ -1,15 +1,22 @@
 import { ArrowLeftIcon } from 'lucide-react';
-import { data, Link } from 'react-router';
+import { Link, redirect } from 'react-router';
 import { PageTitle } from '~/components/page-title';
 import { Button } from '~/components/ui/button';
 import { getInventoryItems } from '~/features/inventory/service';
 import { productService } from '~/features/product/service';
 import { RecipeForm } from '~/features/recipe/recipe-form';
+import { recipeService } from '~/features/recipe/service';
 import { requireAuth } from '~/lib/utils.server';
 import type { Route } from './+types/recipes.new';
 
-export function meta() {
-  return [{ title: 'New Recipe | Kape Natin PH' }];
+export function meta({ data }: Route.MetaArgs) {
+  return [
+    {
+      title: data?.itemToDuplicate
+        ? 'Duplicate Recipe | Kape Natin PH'
+        : 'New Recipe | Kape Natin PH',
+    },
+  ];
 }
 
 export async function loader(args: Route.LoaderArgs) {
@@ -23,7 +30,7 @@ export async function loader(args: Route.LoaderArgs) {
     }),
   ]);
 
-  return data({
+  const defaultLoaderData = {
     products: products.data.map((p) => ({
       id: p.id,
       name: p.name,
@@ -39,11 +46,35 @@ export async function loader(args: Route.LoaderArgs) {
       unit: item.unit,
       unitPrice: item.unitPrice,
     })),
-  });
+    itemToDuplicate: null,
+  };
+
+  const url = new URL(args.request.url);
+
+  const duplicateId = url.searchParams.get('duplicateId');
+
+  if (duplicateId) {
+    const itemToDuplicate = await recipeService.getRecipeById(
+      duplicateId,
+      userId
+    );
+
+    if (itemToDuplicate) {
+      return {
+        products: defaultLoaderData.products,
+        inventoryItems: defaultLoaderData.inventoryItems,
+        itemToDuplicate,
+      };
+    } else {
+      return redirect('/recipes/new');
+    }
+  }
+
+  return defaultLoaderData;
 }
 
 export default function NewRecipePage({ loaderData }: Route.ComponentProps) {
-  const { products, inventoryItems } = loaderData;
+  const { products, inventoryItems, itemToDuplicate } = loaderData;
 
   return (
     <div className="space-y-4 container mx-auto max-w-xl">
@@ -58,14 +89,16 @@ export default function NewRecipePage({ loaderData }: Route.ComponentProps) {
         </Link>
       </Button>
       <PageTitle
-        title="New Recipe"
-        subtitle="Create a new coffee recipe with ingredients and instructions"
+        title={itemToDuplicate ? 'Duplicate Recipe' : 'New Recipe'}
+        subtitle="Create a new recipe with ingredients and instructions"
       />
 
       <RecipeForm
         products={products}
         inventoryItems={inventoryItems}
+        initialValue={itemToDuplicate ? itemToDuplicate : undefined}
         isEditing={false}
+        isDuplicating={itemToDuplicate ? true : false}
       />
     </div>
   );

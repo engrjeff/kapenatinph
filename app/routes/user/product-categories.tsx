@@ -121,7 +121,7 @@ export default function ProductCategoriesPage({
       <>
         <PageTitle
           title="Product Categories"
-          subtitle="Organize your products"
+          subtitle="Organize your product categories"
         />
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed rounded-md">
           <div className="mb-4 p-3 rounded-full bg-muted/50 dark:bg-muted/20">
