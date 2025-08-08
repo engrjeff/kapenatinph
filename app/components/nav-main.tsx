@@ -37,7 +37,7 @@ export function NavMain({
                   cn(
                     sidebarMenuButtonVariants(),
                     isActive
-                      ? 'text-primary hover:text-primary bg-secondary'
+                      ? 'text-primary hover:text-primary bg-sidebar-accent'
                       : '',
                     isPending ? 'opacity-90' : ''
                   )
