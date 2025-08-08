@@ -10,14 +10,7 @@ import { PageTitle } from '~/components/page-title';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
+import { RecipeIngredientsTable } from '~/features/recipe/recipe-ingredients-table';
 import { recipeService } from '~/features/recipe/service';
 import { cn, formatCurrency } from '~/lib/utils';
 import { requireAuth } from '~/lib/utils.server';
@@ -190,67 +183,10 @@ export default function RecipeDetailsPage({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto border rounded-md">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-accent">
-                      <TableHead>#</TableHead>
-                      <TableHead>Ingredient</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Cost</TableHead>
-                      <TableHead>Total Cost</TableHead>
-                      <TableHead>Notes</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recipe.ingredients.map((ingredient, index) => {
-                      const totalCost =
-                        (ingredient.inventory.unitPrice /
-                          ingredient.inventory.amountPerUnit) *
-                        ingredient.quantity;
-                      return (
-                        <TableRow key={ingredient.id}>
-                          <TableCell className="font-medium">
-                            {index + 1}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {ingredient.inventory.name}
-                          </TableCell>
-                          <TableCell className="font-mono">
-                            {ingredient.quantity}
-                            <span className="text-muted-foreground">
-                              {ingredient.unit}
-                            </span>
-                          </TableCell>
-                          <TableCell className="font-mono">
-                            {formatCurrency(
-                              ingredient.inventory.unitPrice /
-                                ingredient.inventory.amountPerUnit
-                            )}
-                            <span className="text-xs text-muted-foreground">
-                              /{ingredient.inventory.unit}
-                            </span>
-                          </TableCell>
-                          <TableCell className="font-medium font-mono">
-                            {formatCurrency(totalCost)}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {ingredient.notes || '-'}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                    <TableRow className="bg-accent hover:bg-accent">
-                      <TableCell colSpan={3}></TableCell>
-                      <TableCell>Total</TableCell>
-                      <TableCell className="font-mono">
-                        {formatCurrency(recipe.totalCost)}
-                      </TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
+              <RecipeIngredientsTable
+                totalCost={recipe.totalCost}
+                ingredients={recipe.ingredients}
+              />
             </CardContent>
           </Card>
         </div>

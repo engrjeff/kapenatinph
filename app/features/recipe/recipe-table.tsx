@@ -10,22 +10,9 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { cn, formatCurrency } from '~/lib/utils';
+import { RecipeIngredientsPopover } from './recipe-ingredients-popover';
 import { RecipeRowActions } from './recipe-row-actions';
-
-type RecipeWithDetails = {
-  id: string;
-  name: string;
-  description: string | null;
-  totalCost: number;
-  prepTimeMinutes: number | null;
-  isActive: boolean;
-  product?: { name: string; category: { name: string } } | null;
-  productVariant?: {
-    title: string;
-    product: { name: string; category: { name: string } };
-  } | null;
-  _count: { ingredients: number };
-};
+import type { RecipeWithDetails } from './service';
 
 export function RecipeTable({ data }: { data: Array<RecipeWithDetails> }) {
   return (
@@ -107,10 +94,7 @@ export function RecipeTable({ data }: { data: Array<RecipeWithDetails> }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">
-                      {recipe._count.ingredients} ingredient
-                      {recipe._count.ingredients !== 1 ? 's' : ''}
-                    </span>
+                    <RecipeIngredientsPopover recipe={recipe} />
                   </TableCell>
                   <TableCell>
                     {recipe.prepTimeMinutes ? (
