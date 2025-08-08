@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PlusIcon, TrashIcon } from 'lucide-react';
+import { PlusIcon, XIcon } from 'lucide-react';
 import {
   useFieldArray,
   useForm,
@@ -23,6 +23,7 @@ import { SubmitButton } from '~/components/ui/submit-button';
 import { Switch } from '~/components/ui/switch';
 import { Textarea } from '~/components/ui/textarea';
 import { useFetcherWithResponseHandler } from '~/hooks/useFetcherWithResponseHandler';
+import { cn } from '~/lib/utils';
 import { recipeSchema, type RecipeInputs } from './schema';
 
 interface RecipeFormProps {
@@ -79,7 +80,10 @@ export function RecipeForm({
         quantity: ing.quantity,
         unit: ing.unit,
         notes: ing.notes ?? '',
-      })) ?? [{ inventoryId: '', quantity: 0, unit: '', notes: '' }],
+      })) ?? [
+        { inventoryId: '', quantity: 0, unit: '', notes: '' },
+        { inventoryId: '', quantity: 0, unit: '', notes: '' },
+      ],
     },
   });
 
@@ -332,6 +336,11 @@ export function RecipeForm({
                 <p className="text-xs text-muted-foreground">
                   Add the ingredients and quantities needed for this recipe
                 </p>
+                {form.formState.errors?.ingredients?.root?.message ? (
+                  <p className="text-destructive text-sm">
+                    {form.formState.errors?.ingredients?.root?.message}
+                  </p>
+                ) : null}
               </div>
               <Button
                 type="button"
@@ -344,19 +353,18 @@ export function RecipeForm({
               </Button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 border rounded-lg p-4 ">
               {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="relative border rounded-lg p-4 space-y-3"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-3 items-start">
+                <div key={field.id}>
+                  <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_36px] gap-3 items-end">
                     <FormField
                       control={form.control}
                       name={`ingredients.${index}.inventoryId`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs">
+                          <FormLabel
+                            className={cn(index === 0 ? 'text-xs' : 'hidden')}
+                          >
                             Inventory Item
                           </FormLabel>
                           <FormControl>
@@ -375,7 +383,7 @@ export function RecipeForm({
                               ))}
                             </SelectNative>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="sr-only" />
                         </FormItem>
                       )}
                     />
@@ -383,18 +391,25 @@ export function RecipeForm({
                     <FormField
                       control={form.control}
                       name={`ingredients.${index}.quantity`}
-                      render={({ field }) => (
+                      render={() => (
                         <FormItem>
-                          <FormLabel className="text-xs">Quantity</FormLabel>
+                          <FormLabel
+                            className={cn(index === 0 ? 'text-xs' : 'hidden')}
+                          >
+                            Quantity
+                          </FormLabel>
                           <FormControl>
                             <NumberInput
-                              placeholder="10"
+                              placeholder="0"
                               step={0.01}
                               min={0}
-                              {...field}
+                              {...form.register(
+                                `ingredients.${index}.quantity`,
+                                { valueAsNumber: true }
+                              )}
                             />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="sr-only" />
                         </FormItem>
                       )}
                     />
@@ -404,27 +419,29 @@ export function RecipeForm({
                       name={`ingredients.${index}.unit`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs">Unit</FormLabel>
+                          <FormLabel
+                            className={cn(index === 0 ? 'text-xs' : 'hidden')}
+                          >
+                            Unit
+                          </FormLabel>
                           <FormControl>
                             <Input {...field} readOnly />
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="sr-only" />
                         </FormItem>
                       )}
                     />
 
-                    <div className="absolute top-1 right-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="shrink-0"
-                        onClick={() => remove(index)}
-                        disabled={fields.length === 1}
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0 bg-accent border-input"
+                      onClick={() => remove(index)}
+                      disabled={fields.length <= 2} // requires at least 2 ingredients
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </Button>
                   </div>
 
                   {/* <FormField

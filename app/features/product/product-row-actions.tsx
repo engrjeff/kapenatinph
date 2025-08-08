@@ -1,4 +1,4 @@
-import { MoreVerticalIcon } from 'lucide-react';
+import { CopyIcon, EditIcon, MoreHorizontalIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
 import {
@@ -19,17 +19,19 @@ export function ProductRowActions({ productId }: { productId: string }) {
             className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
             size="icon"
           >
-            <MoreVerticalIcon />
+            <MoreHorizontalIcon />
             <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuContent align="end" className="w-36">
           <DropdownMenuItem asChild>
-            <Link to={`/products/${productId}/edit`}>Edit</Link>
+            <Link to={`/products/${productId}/edit`}>
+              <EditIcon /> Edit
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to={`/products/new?duplicateId=${productId}`}>
-              Make a copy
+              <CopyIcon /> Make a copy
             </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>

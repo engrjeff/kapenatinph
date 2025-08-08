@@ -1,4 +1,9 @@
-import { MoreVerticalIcon } from 'lucide-react';
+import {
+  CopyIcon,
+  EditIcon,
+  MoreHorizontalIcon,
+  TrashIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Button } from '~/components/ui/button';
@@ -31,23 +36,27 @@ export function RecipeRowActions({ recipe }: RecipeRowActionsProps) {
             className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
             size="icon"
           >
-            <MoreVerticalIcon />
+            <MoreHorizontalIcon />
             <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
+        <DropdownMenuContent align="end" className="w-36">
           <DropdownMenuItem asChild>
-            <Link to={`/recipes/${recipe.id}`}>View</Link>
+            <Link to={`/recipes/${recipe.id}/edit`}>
+              <EditIcon /> Edit
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to={`/recipes/${recipe.id}/edit`}>Edit</Link>
+            <Link to={`/recipes/new?duplicateId=${recipe.id}`}>
+              <CopyIcon /> Make a copy
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
             onClick={() => setAction('delete')}
           >
-            Delete
+            <TrashIcon /> Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

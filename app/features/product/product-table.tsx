@@ -1,4 +1,5 @@
 import { PackageIcon } from 'lucide-react';
+import { Link } from 'react-router';
 import { Badge } from '~/components/ui/badge';
 import {
   Table,
@@ -71,7 +72,12 @@ export function ProductTable({
                 <TableCell>{productIndex + 1}</TableCell>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{product.name}</div>
+                    <Link
+                      to={`/products/${product.id}/edit`}
+                      className="font-medium hover:underline"
+                    >
+                      {product.name}
+                    </Link>
                     {product.sku && (
                       <div className="text-xs text-muted-foreground">
                         SKU: {product.sku}

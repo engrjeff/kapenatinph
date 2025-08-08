@@ -55,7 +55,7 @@ export function InventoryForm({
       unit: initialValue?.unit ?? '',
       amountPerUnit: initialValue?.amountPerUnit ?? undefined,
       quantity: initialValue?.quantity ?? undefined,
-      reorderLevel: initialValue?.reorderLevel ?? undefined,
+      reorderLevel: initialValue?.reorderLevel ?? 0,
       supplier: initialValue?.supplier ?? '',
     },
   });
@@ -201,11 +201,16 @@ export function InventoryForm({
             <FormField
               control={form.control}
               name="unitPrice"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Unit Price</FormLabel>
                   <FormControl>
-                    <NumberInput usePeso min={0} placeholder="0" {...field} />
+                    <NumberInput
+                      usePeso
+                      min={0}
+                      placeholder="0"
+                      {...form.register('unitPrice', { valueAsNumber: true })}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -235,11 +240,17 @@ export function InventoryForm({
             <FormField
               control={form.control}
               name="amountPerUnit"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Amount per Unit</FormLabel>
                   <FormControl>
-                    <NumberInput min={0} placeholder="0" {...field} />
+                    <NumberInput
+                      min={0}
+                      placeholder="0"
+                      {...form.register('amountPerUnit', {
+                        valueAsNumber: true,
+                      })}
+                    />
                   </FormControl>
                   <FormDescription>e.g. 1 pack of Milk = 120ml</FormDescription>
                   <FormMessage />
@@ -269,7 +280,7 @@ export function InventoryForm({
             <FormField
               control={form.control}
               name="quantity"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Quantity/Stock</FormLabel>
                   <FormControl>
@@ -278,7 +289,7 @@ export function InventoryForm({
                       min={0}
                       noDecimal
                       placeholder="0"
-                      {...field}
+                      {...form.register('quantity', { valueAsNumber: true })}
                     />
                   </FormControl>
                   <FormMessage />
@@ -289,7 +300,7 @@ export function InventoryForm({
             <FormField
               control={form.control}
               name="reorderLevel"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Reorder Level (Optional)</FormLabel>
                   <FormControl>
@@ -298,7 +309,9 @@ export function InventoryForm({
                       min={0}
                       noDecimal
                       placeholder="0"
-                      {...field}
+                      {...form.register('reorderLevel', {
+                        valueAsNumber: true,
+                      })}
                     />
                   </FormControl>
                   <FormDescription>Low in stock qty.</FormDescription>

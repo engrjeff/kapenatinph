@@ -32,36 +32,24 @@ export const inventorySchema = z.object({
     .string({ error: 'Unit is required' })
     .min(1, { message: 'Unit is required' }),
 
-  quantity: z.preprocess(
-    (val) => (val === '' ? undefined : Number(val)),
-    z
-      .number({ error: 'Quantity is required' })
-      .int({ error: 'Must be a whole number' })
-      .nonnegative({ message: 'Quantity cannot be negative' })
-  ) as unknown as z.ZodNumber,
+  quantity: z
+    .number({ error: 'Quantity is required' })
+    .int({ error: 'Must be a number' })
+    .nonnegative({ message: 'Quantity cannot be negative' }),
 
   reorderLevel: z
-    .preprocess(
-      (val) => (val === '' ? undefined : Number(val)),
-      z
-        .int({ error: 'Must be a whole number' })
-        .nonnegative({ message: 'Reorder level cannot be negative' })
-    )
-    .optional() as unknown as z.ZodOptional<z.ZodNumber>,
+    .int({ error: 'Must be a number' })
+    .nonnegative({ message: 'Reorder level cannot be negative' }),
 
-  unitPrice: z.preprocess(
-    (val) => (val === '' ? undefined : Number(val)),
-    z
-      .number({ error: 'Unit price is required' })
-      .nonnegative({ message: 'Unit price cannot be negative' })
-  ) as unknown as z.ZodNumber,
+  unitPrice: z
+    .number({ error: 'Unit price is required' })
+    .gt(0, { error: 'Must be greater than 0' })
+    .nonnegative({ message: 'Unit price cannot be negative' }),
 
-  amountPerUnit: z.preprocess(
-    (val) => (val === '' ? undefined : Number(val)),
-    z
-      .number({ error: 'Amount per unit is required' })
-      .nonnegative({ message: 'Amount per unit cannot be negative' })
-  ) as unknown as z.ZodNumber,
+  amountPerUnit: z
+    .number({ error: 'Amount per unit is required' })
+    .gt(1, { error: 'Must be greater than 0' })
+    .nonnegative({ message: 'Amount per unit cannot be negative' }),
 
   supplier: z
     .string()

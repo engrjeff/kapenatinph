@@ -305,6 +305,7 @@ export function ProductForm({
                       <NumberInput
                         step={0.01}
                         min={0}
+                        usePeso
                         placeholder="0.00"
                         {...form.register('basePrice', { valueAsNumber: true })}
                       />
@@ -329,13 +330,14 @@ export function ProductForm({
                         size="icon"
                         variant="secondary"
                         className="absolute inset-y-1 end-1 size-7"
+                        title="Click to generate SKU"
                         onClick={() => {
                           const productName = form.watch('name');
                           const newSku = generateSku(productName);
                           field.onChange(newSku);
                         }}
                       >
-                        <RotateCwIcon className="size-4" />
+                        <RotateCwIcon className="size-3" />
                       </Button>
                     </div>
                     <FormMessage />
@@ -587,7 +589,8 @@ export function ProductForm({
                                       type="button"
                                       size="icon"
                                       variant="secondary"
-                                      className="absolute inset-y-1 end-1 size-6"
+                                      className="absolute inset-y-1 end-1 size-7"
+                                      title="Click to generate SKU"
                                       onClick={() => {
                                         const variantTitle = form.watch(
                                           `variants.${index}.title`
@@ -618,6 +621,7 @@ export function ProductForm({
                                     <NumberInput
                                       step={0.01}
                                       min={0}
+                                      usePeso
                                       placeholder="0.0"
                                       {...form.register(
                                         `variants.${index}.price`,
@@ -640,38 +644,7 @@ export function ProductForm({
                                     <FormControl>
                                       <Switch
                                         checked={field.value}
-                                        onCheckedChange={(checked) => {
-                                          field.onChange(checked);
-                                          if (checked) {
-                                            // const basePrice =
-                                            //   form.watch('basePrice');
-                                            // // Set basePrice for the new default variant
-                                            // form.setValue(
-                                            //   `variants.${index}.price`,
-                                            //   basePrice
-                                            // );
-                                            // // Uncheck other defaults and clear their prices if they match basePrice
-                                            // variantFields.forEach((_, i) => {
-                                            //   if (i !== index) {
-                                            //     form.setValue(
-                                            //       `variants.${i}.isDefault`,
-                                            //       false
-                                            //     );
-                                            //     const currentPrice = form.watch(
-                                            //       `variants.${i}.price`
-                                            //     );
-                                            //     if (
-                                            //       currentPrice === basePrice
-                                            //     ) {
-                                            //       form.setValue(
-                                            //         `variants.${i}.price`,
-                                            //         0
-                                            //       );
-                                            //     }
-                                            //   }
-                                            // });
-                                          }
-                                        }}
+                                        onCheckedChange={field.onChange}
                                       />
                                     </FormControl>
                                   </FormItem>

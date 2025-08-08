@@ -46,7 +46,7 @@ export default function NewRecipePage({ loaderData }: Route.ComponentProps) {
   const { products, inventoryItems } = loaderData;
 
   return (
-    <div className="space-y-4 container mx-auto max-w-lg">
+    <div className="space-y-4 container mx-auto max-w-xl">
       <Button
         size="sm"
         variant="link"

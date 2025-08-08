@@ -36,7 +36,10 @@ export function ProductCategoryRowActions({
             <EditIcon className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setAction('delete')}>
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setAction('delete')}
+          >
             <TrashIcon className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>

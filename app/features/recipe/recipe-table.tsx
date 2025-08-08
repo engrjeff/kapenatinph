@@ -98,7 +98,9 @@ export function RecipeTable({ data }: { data: Array<RecipeWithDetails> }) {
                   </TableCell>
                   <TableCell>
                     {recipe.prepTimeMinutes ? (
-                      <span className="text-sm">{recipe.prepTimeMinutes}m</span>
+                      <span className="text-sm">
+                        {recipe.prepTimeMinutes} minutes
+                      </span>
                     ) : (
                       <span className="text-sm text-muted-foreground">
                         Not set

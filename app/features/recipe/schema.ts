@@ -5,17 +5,12 @@ export const recipeIngredientSchema = z.object({
     .string({ error: 'Inventory item is required' })
     .min(1, { message: 'Inventory item is required' }),
 
-  quantity: z.preprocess(
-    (val) => (val === '' ? undefined : Number(val)),
-    z
-      .number({ error: 'Quantity is required' })
-      .int({ error: 'Must be a whole number' })
-      .nonnegative({ message: 'Quantity cannot be negative' })
-  ) as unknown as z.ZodNumber,
+  quantity: z
+    .number({ error: 'Quantity is required' })
+    .gt(0, { error: 'Quantity must be greater than zero' })
+    .nonnegative({ message: 'Quantity cannot be negative' }),
 
-  unit: z
-    .string({ error: 'Unit is required' })
-    .min(1, { message: 'Unit is required' }),
+  unit: z.string(),
 
   notes: z
     .string()
@@ -51,11 +46,27 @@ export const recipeSchema = z.object({
   productId: z.string({ error: 'Product is required' }),
   productVariantId: z.string().optional(),
 
+  isActive: z.boolean(),
+
   ingredients: z
     .array(recipeIngredientSchema)
-    .min(1, { message: 'At least one ingredient is required' }),
+    .min(2, { message: 'At least two ingredients are required' })
+    .superRefine((items, ctx) => {
+      const uniqueItemsCount = new Set(
+        items.map((item) => item.inventoryId.toLowerCase())
+      ).size;
+      const errorPosition = items.length - 1;
 
-  isActive: z.boolean(),
+      const target = items[errorPosition];
+
+      if (uniqueItemsCount !== items.length) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `${target.inventoryId} already exists.`,
+          path: [errorPosition, 'inventoryId'],
+        });
+      }
+    }),
 });
 
 export const createRecipeSchema = recipeSchema.extend({
