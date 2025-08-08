@@ -48,15 +48,7 @@ export const recipeService = {
         },
         ingredients: {
           include: {
-            inventory: {
-              select: {
-                name: true,
-                unitPrice: true,
-                orderUnit: true,
-                amountPerUnit: true,
-                unit: true,
-              },
-            },
+            inventory: true,
           },
         },
         _count: {
@@ -104,16 +96,7 @@ export const recipeService = {
         },
         ingredients: {
           include: {
-            inventory: {
-              select: {
-                id: true,
-                name: true,
-                unitPrice: true,
-                orderUnit: true,
-                amountPerUnit: true,
-                unit: true,
-              },
-            },
+            inventory: true,
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -330,3 +313,7 @@ export const recipeService = {
     });
   },
 };
+
+export type RecipeWithDetails = Awaited<
+  ReturnType<typeof recipeService.getAllRecipes>
+>['data'][number];
