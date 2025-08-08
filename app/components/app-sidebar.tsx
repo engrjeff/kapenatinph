@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <Link to="/" className="flex items-center gap-2">
               <IconCoffee className="!size-5" />
-              <span className="text-base font-semibold">KapeNatin PH.</span>
+              <span className="text-base font-semibold">KapeNatin PH</span>
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
