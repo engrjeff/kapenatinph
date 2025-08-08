@@ -9,9 +9,14 @@ This is a coffee shop management application built with React Router v7, TypeScr
 - **TypeScript**: v5.8.3
 - **Database**: PostgreSQL with Prisma v6.13.0
 - **UI Library**: Radix UI components with custom Tailwind styling
-- **Forms**: React Hook Form v7.61.1 with Zod v4.0.14 validation
+- **Forms**: React Hook Form v7.61.1 with Zod v4.0.15 validation
 - **Authentication**: Clerk (v5.38.1)
 - **Styling**: Tailwind CSS v4.1.4
+- **Icons**: Tabler Icons v3.34.1 and Lucide React v0.535.0
+- **Animation**: Motion v12.23.12
+- **Data Tables**: TanStack React Table v8.21.3
+- **Charts**: Recharts v2.15.4
+- **Notifications**: Sonner v2.0.7
 
 ## File Structure Conventions
 ```
@@ -27,6 +32,8 @@ app/
 ├── hooks/            # Custom React hooks
 ├── lib/              # Utilities and configuration
 ├── routes/           # React Router v7 file-based routing
+│   ├── site/        # Public marketing pages
+│   └── user/        # Protected application pages
 └── generated/        # Prisma generated client
 ```
 
@@ -117,19 +124,51 @@ Based on git history, follow these patterns:
 - Use `generateSku()` utility for SKU generation
 - Support both simple products and complex variant products
 - Auto-generate variant combinations from options
+- Support product editing with variant updates
 
 ### Inventory Management
 - Track quantity, reorder levels, and unit prices
 - Link inventory items to product categories
 - Support different measurement units
+- Include inventory status tracking (In Stock, Low Stock, Out of Stock)
+- Provide inventory statistics and analytics
+
+### Recipe Management
+- Recipes are linked to products and optional product variants
+- Support multiple ingredients with quantities and units
+- Include preparation time, instructions, and descriptions
+- Validate minimum 2 ingredients per recipe
+- Prevent duplicate ingredients in same recipe
+- Support recipe ingredients with notes
 
 ### Authentication
 - Use Clerk for user authentication
 - Store userId with all user-specific data
 - Implement proper multi-tenant data isolation
+- Support onboarding flow for new users
+
+## Recent Feature Updates
+
+### Recipe Management System
+- Added comprehensive recipe creation and management
+- Recipe ingredients table with popover UI for detailed view
+- Support for recipe-product relationships with variants
+- Validation for ingredient uniqueness and minimum requirements
+
+### Product Variant Updates
+- Enhanced product variant editing capabilities
+- Improved variant generation and management
+- Better SKU handling for variant products
+
+### UI/UX Improvements
+- Enhanced sidebar navigation with active states
+- Improved table layouts with row actions
+- Better form validation and error handling
+- Responsive design patterns throughout
 
 ## Development Workflow
 1. Run `npm run dev` for development server
 2. Run `npm run typecheck` before committing
 3. Use feature branches for new development
 4. Follow the established commit message conventions
+5. Run `npm run lint:fix` to fix linting issues
